@@ -1,0 +1,181 @@
+unit renderer;
+
+{$mode ObjFPC}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils,OpenGLContext, GL, glu, BGRABitmap, Texture, dialogs;
+
+type
+  TIntegerArray = array of array of Integer;
+
+  TRenderer = class
+     procedure Mode2D;
+     procedure ClearScreen;
+     procedure Draw;
+     procedure DrawTilemap(arr: TIntegerArray; texture: TTexture; t: integer);
+     function glGetViewportWidth: Integer;
+     function glGetViewportHeight: Integer;
+     function LoadGLTexture(const FileName: String): GLuint;
+  end;
+
+implementation
+
+function TRenderer.glGetViewportWidth: Integer;
+var
+  Rect: array[0..3] of Integer;
+begin
+  glGetIntegerv(GL_VIEWPORT, @Rect);
+  Result := Rect[2] - Rect[0];
+end;
+
+function TRenderer.glGetViewportHeight: Integer;
+var
+  Rect: array[0..3] of Integer;
+begin
+  glGetIntegerv(GL_VIEWPORT, @Rect);
+  Result := Rect[3] - Rect[1];
+end;
+
+procedure TRenderer.Draw;
+var
+  i: integer;
+  _width, w: integer;
+  _height, h: integer;
+  x, y: integer;
+  t: integer;
+  c: integer;
+  tiles: array[0..4,0..9] of Integer = (
+    (1,1,1,1,1,1,1,1,1,1),
+    (1,0,0,0,1,0,1,0,0,1),
+    (1,0,0,0,1,0,1,0,0,1),
+    (1,0,0,0,0,0,0,0,0,1),
+    (1,1,1,1,1,1,1,1,1,1)
+  );
+begin
+  t:=32;
+  _width := 10;
+  _height := 5;
+  ClearScreen;
+  Mode2D;
+  glBegin(GL_QUADS);
+     for h:=0 to _height - 1 do
+     begin
+       for w:=0 to _width - 1 do
+       begin
+         glColor3f(1, tiles[h][w], 0);
+         glVertex3f(w*t,h*t,0);
+         glVertex3f(w*t,h*t+t,0);
+         glVertex3f(w*t+t,h*t+t,0);
+         glVertex3f(w*t+t,h*t,0);
+       end;
+     end;
+  glEnd;
+end;
+
+procedure TRenderer.Mode2D;
+begin
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix;
+  glLoadIdentity;
+  gluOrtho2D(0, glGetViewportWidth, glGetViewportHeight, 0);
+
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix;
+  glLoadIdentity;
+end;
+
+procedure TRenderer.ClearScreen;
+begin
+  glClearColor(0.27, 0.53, 0.71, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity;
+end;
+
+procedure TRenderer.DrawTilemap(arr: TIntegerArray; texture: TTexture; t: integer);
+var
+  h,w: integer;
+  tile: integer;
+  srcX, srcY: real;
+  srcW, srcH: real;
+begin
+  //ClearScreen;
+  //Mode2D;
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texture.Id);
+  glColor3f(1,1,1);
+  glBegin(GL_QUADS);
+       for h:=Low(arr) to High(arr) do
+       begin
+         for w:=Low(arr[h]) to High(arr[h]) do
+         begin
+           if (arr[h][w] < 0 ) then
+           begin
+             continue;
+           end;
+           srcY := (arr[h][w] div (texture.Width div t) * t) / texture.Height;
+           srcX := (arr[h][w] mod (texture.Width div t) * t) / texture.Width;
+           srcW := t / texture.Width;
+           srcH := t / texture.Height;
+           //glColor3f(1, arr[h][w], 0);
+           tile := t;
+           //**
+           glTexCoord2f(srcX, srcY);
+           glVertex3f(w*tile,h*tile,0);
+           //**
+           glTexCoord2f(srcX, srcY + srcH);
+           glVertex3f(w*tile,h*tile+tile,0);
+           //**
+           glTexCoord2f(srcX + srcW, srcY + srcH);
+           glVertex3f(w*tile+tile,h*tile+tile,0);
+           //**
+           glTexCoord2f(srcX + srcW, srcY);
+           glVertex3f(w*tile+tile,h*tile,0);
+         end;
+       end;
+    glEnd;
+end;
+
+function TRenderer.LoadGLTexture(const FileName: String): GLuint;
+var
+  Bitmap: TBGRABitmap;
+  TextureID: GLuint;
+  PixelFormat: GLenum;
+  Data: Pointer;
+begin
+  // Initialize the texture ID
+  //TextureID:= 0;
+  glGenTextures(1, @TextureID);
+  glBindTexture(GL_TEXTURE_2D, TextureID);
+
+  // Load the image using BGRABitmap
+  Bitmap := TBGRABitmap.Create(FileName);
+  try
+    // Choose the appropriate OpenGL pixel format
+    if Bitmap.HasTransparentPixels then
+      PixelFormat := GL_RGBA
+    else
+      PixelFormat := GL_RGB;
+
+    Data := Bitmap.Data;  // Directly access raw pixel data
+
+    // Set OpenGL texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // Load the texture data into OpenGL
+    glTexImage2D(GL_TEXTURE_2D, 0, PixelFormat, Bitmap.Width, Bitmap.Height, 0, PixelFormat, GL_UNSIGNED_BYTE, Data);
+
+    Result := TextureID;
+
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+
+end.
+
