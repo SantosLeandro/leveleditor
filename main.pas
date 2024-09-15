@@ -6,13 +6,19 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, OpenGLContext,
-  GL, glu, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, Vector2;
+  GL, glu, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, Vector2,FileHelper,
+  ComCtrls, BCListBox, BGRASpriteAnimation, BGRABitmap, BCTypes;
 
 type
 
   { TFormMain }
 
   TFormMain = class(TForm)
+    PageControl1: TPageControl;
+    ScrollBox1: TScrollBox;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    Tileset: TBGRASpriteAnimation;
     GLBox: TOpenGLControl;
     Label1: TLabel;
     ListBoxLayers: TListBox;
@@ -25,6 +31,7 @@ type
     MenuItem6: TMenuItem;
     LeftPanel: TPanel;
     OpenDialog: TOpenDialog;
+    StatusBar1: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure GLBoxClick(Sender: TObject);
@@ -39,12 +46,20 @@ type
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
     procedure MenuItemOpenClick(Sender: TObject);
+    procedure TilesetClick(Sender: TObject);
+    procedure TilesetMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure TilesetRedrawAfter(Sender: TObject; Bitmap: TBGRABitmap);
+    procedure TilesetRedrawBefore(Sender: TObject; Bitmap: TBGRABitmap);
   private
 
   public
     Level: TLevel;
     Texture: TTexture;
     Renderer: TRenderer;
+    LevelFile: TLevelFile;
     tileSize: integer;
     Tilemap : TIntegerArray;
     LayerId: integer;
@@ -52,11 +67,14 @@ type
     OldMouseX, OldMouseY: integer;
     OffsetX, OffsetY: integer;
     Offset: TPoint2D;
+    TilesetCursor: TPoint2D;
     CanMove: boolean;
     MouseLeftBtn: boolean;
     MouseMiddleBtn: boolean;
     Scale: integer;
+    TileId: integer;
     function getTestMap: TIntegerArray;
+    procedure InitLevel;
 
   end;
 
@@ -89,11 +107,29 @@ begin
     result := tiles;
 end;
 
-{ TFormMain }
-
-procedure TFormMain.FormCreate(Sender: TObject);
+procedure TFormMain.InitLevel;
 var
   i: integer;
+begin
+    LevelFile := TLevelFile.Create;
+    //Level := Level.Load('level.json');
+    Level := TLevel.Create(1);
+    Level.Tilesize:= 16;
+    Level.Width := 10;
+    Level.Height := 10;
+    Level.Scale := 1;
+    Texture := TTexture.Create();
+    Level.Layer[0] := TLayer.Create(texture,getTestMap(),'background');
+    LayerId := 0;
+
+    for i:= 0 to Level.LayerCount do
+    begin
+       ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
+    end;
+end;
+
+{ TFormMain }
+procedure TFormMain.FormCreate(Sender: TObject);
 begin
   GLbox := TOpenGLControl.Create(Self);
   GLbox.AutoResizeViewport := true;
@@ -108,24 +144,14 @@ begin
   GLBox.OnKeyDown := @GLBoxKeyDown;
   GLBox.OnKeyUp := @GLBoxKeyUp;
   Renderer := TRenderer.Create;
-  texture := nil;
   canMove := false;
-  tileSize := 16;
   scale := 1;
-  Level := TLevel.Create(1);
-  Level.Tilesize:= 16;
-  Level.Width := 10;
-  Level.Height := 10;
-  Level.Scale := 2;
-  Level.Layer[0] := TLayer.Create(texture,getTestMap(),'background');
   OffsetX:=0;
   OffsetY:=0;
   LayerId := 0;
+  InitLevel;
 
-  for i:= 0 to Level.LayerCount do
-  begin
-     ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
-  end;
+
 
 end;
 
@@ -187,12 +213,12 @@ begin
    MouseLeftBtn := false;
    posX := (x - offsetX) div Level.tileSize;
    posY := (y - offsetY) div Level.tileSize;
-   if( posY <= High(Level.Layer[LayerId].Data)) and (posX <= High(Level.Layer[LayerId].Data[0])) then
+   if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
    begin
     if Button = mbLeft then
        begin
           MouseLeftBtn := true;
-          Level.Layer[LayerId].Data[posY][posX] := 6;
+          Level.Layer[LayerId].Data[posY][posX] := tileID;
        end;
     if Button = mbRight then
        begin
@@ -218,13 +244,13 @@ begin
    if MouseMiddleBtn then
    begin
      if( x > OldMouseX) then
-         OffsetX := OffsetX + 8;
+         OffsetX := OffsetX + 4;
      if ( x < OldMouseX) then
-         OffsetX := OffsetX - 8;
+         OffsetX := OffsetX - 4;
      if( y > OldMouseY) then
-         OffsetY := OffsetY + 8;
+         OffsetY := OffsetY + 4;
      if ( y < OldMouseY) then
-         OffsetY := OffsetY - 8;
+         OffsetY := OffsetY - 4;
      OldMouseX := X;
      OldMouseY := Y;
    end;
@@ -291,12 +317,73 @@ end;
 
 procedure TFormMain.ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
 begin
-  ShowMessage(ListBoxLayers.ItemIndex.toString);
+  LayerId := ListBoxLayers.ItemIndex;
+  if Level.Layer[LayerId].Texture.Bitmap <> nil then
+  begin
+    Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+  end;
 end;
 
 procedure TFormMain.MenuItemOpenClick(Sender: TObject);
+var
+   I: integer;
 begin
-   OpenDialog.Execute;
+   if OpenDialog.Execute then
+    begin
+      if fileExists(OpenDialog.Filename) then
+        Level.free;
+        Level := LevelFile.Load(OpenDialog.Filename);
+        ListBoxLayers.Clear;
+        for i:= 0 to Level.LayerCount do
+        begin
+           ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
+        end;
+    end
+    else
+      ShowMessage('No file selected');
+    end;
+
+procedure TFormMain.TilesetClick(Sender: TObject);
+begin
+
+end;
+
+procedure TFormMain.TilesetMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  row, col: integer;
+begin
+  col := x div Level.Tilesize;
+  row := y div Level.Tilesize;
+  tileId := col + (row * ( Level.Layer[LayerId].Texture.Width div Level.Tilesize));
+end;
+
+procedure TFormMain.TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  TilesetCursor.x := x div Level.Tilesize * Level.Tilesize;
+  TilesetCursor.y := y div Level.Tilesize * Level.Tilesize;
+  Tileset.Invalidate;
+end;
+
+procedure TFormMain.TilesetRedrawAfter(Sender: TObject; Bitmap: TBGRABitmap);
+var
+   rect : TRect;
+begin
+  rect.Top:= TilesetCursor.y;
+  rect.Bottom:= TilesetCursor.y + Level.tilesize;
+  rect.Left:= TilesetCursor.x;
+  rect.Right := TilesetCursor.x + Level.tilesize;
+  if  Level.Layer[LayerId].Texture.Bitmap <> nil then
+  begin
+     Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+     Tileset.Sprite.Canvas.DrawFocusRect(rect);
+  end;
+end;
+
+procedure TFormMain.TilesetRedrawBefore(Sender: TObject; Bitmap: TBGRABitmap);
+begin
+
 end;
 
 end.

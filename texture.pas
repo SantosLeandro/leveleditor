@@ -11,16 +11,19 @@ type
   TTexture = class
   private
     FTextureID: GLuint;
+
     FWidth: integer;
     FHeight: integer;
+    FBitmap: TBGRABitmap;
   public
+
     constructor Create;
     destructor Destroy; override;
 
     procedure LoadFromFile(const FileName: string);
     procedure Bind;
     procedure Unbind;
-
+    property Bitmap: TBGRABitmap read FBitmap write FBitmap;
     property Id: GLuint read FTextureID;
     property Width: integer read FWidth;
     property Height: integer read FHeight;
@@ -48,7 +51,6 @@ end;
 
 procedure TTexture.LoadFromFile(const FileName: string);
 var
-  Bitmap: TBGRABitmap;
   PixelFormat: GLenum;
 begin
   // Load image using BGRABitmap
@@ -77,7 +79,7 @@ begin
       0, PixelFormat, GL_UNSIGNED_BYTE, Bitmap.Data);
 
   finally
-    Bitmap.Free;
+    //Bitmap.Free;
   end;
 end;
 

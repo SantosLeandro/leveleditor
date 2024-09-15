@@ -1,0 +1,15 @@
+{
+    "texture":"gameobjects.png",
+    "gameobjects":[
+        {
+            "name":"player",
+            "width":"32",
+            "height":"64"
+        },
+        {
+            "name":"enemy",
+            "width":"32",
+            "height":"64"
+        }
+    ]
+}

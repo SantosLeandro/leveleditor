@@ -25,6 +25,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="bgracontrols"/>
+      </Item>
+      <Item>
         <PackageName Value="BGRABitmapPack"/>
       </Item>
       <Item>
@@ -71,6 +74,11 @@
         <Filename Value="vector2.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Vector2"/>
+      </Unit>
+      <Unit>
+        <Filename Value="filehelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="FileHelper"/>
       </Unit>
     </Units>
   </ProjectOptions>
