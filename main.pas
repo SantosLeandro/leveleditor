@@ -116,6 +116,7 @@ begin
   Level.Tilesize:= 16;
   Level.Width := 10;
   Level.Height := 10;
+  Level.Scale := 2;
   Level.Layer[0] := TLayer.Create(texture,getTestMap(),'background');
   OffsetX:=0;
   OffsetY:=0;
@@ -184,8 +185,8 @@ var
    posX, posY: integer;
 begin
    MouseLeftBtn := false;
-   posX := (x - offsetX) div tileSize;
-   posY := (y - offsetY) div tileSize;
+   posX := (x - offsetX) div Level.tileSize;
+   posY := (y - offsetY) div Level.tileSize;
    if( posY <= High(Level.Layer[LayerId].Data)) and (posX <= High(Level.Layer[LayerId].Data[0])) then
    begin
     if Button = mbLeft then
@@ -227,8 +228,8 @@ begin
      OldMouseX := X;
      OldMouseY := Y;
    end;
-   MouseX := (x - OffsetX) div tileSize * tileSize;
-   MouseY := (y - OffsetY) div tileSize * tileSize;
+   MouseX := (x - OffsetX) div Level.tileSize * Level.tileSize;
+   MouseY := (y - OffsetY) div Level.tileSize * Level.tileSize;
    GLBox.Invalidate;
 end;
 
@@ -255,7 +256,7 @@ begin
    Level.Layer[LayerId].Texture := texture;
   end;
 
-  {{ prepare to draw }}
+  // prepare to draw
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable( GL_BLEND );
   Renderer.ClearScreen;
@@ -263,7 +264,7 @@ begin
   glTranslatef(offsetX,offsetY,0);
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 
-  {{ draw level }}
+  // draw level
   if( level <> nil ) then
   begin
     Renderer.DrawBackground(level.width,level.height,Level.TileSize);
@@ -274,7 +275,7 @@ begin
     end;
    end;
 
-  {{ Draw Mouse Cursor }}
+  // Draw Mouse Cursor
    glBindTexture(GL_TEXTURE_2D, 0);
    glColor4f(1,1,0,0.2);
    glBegin(GL_QUADS);
@@ -284,7 +285,7 @@ begin
      glVertex3f(mouseX, mouseY+Level.Tilesize,0);
    glEnd();
 
-  {{ present renderer }}
+  // present renderer
   GLbox.SwapBuffers;
 end;
 

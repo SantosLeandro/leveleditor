@@ -18,8 +18,10 @@ type
     FName: string;
     FWidth: integer;
     FHeight: integer;
+    FScale: integer;
     procedure SetData(Index: integer; l: TLayer);
     function GetData(Index: integer): TLayer;
+
 
   public
     constructor Create(numLayers: integer);
@@ -31,6 +33,7 @@ type
     function LayerCount(): integer;
     function IsEmpty(index: integer): boolean;
     function GetLayer(Index: integer): TIntegerArray;
+    function GetTileScale: integer;
     procedure SetLayer(Index: integer; arr: TIntegerArray);
     //property Layer[index: integer]: TIntegerArray read GetLayer write SetLayer;
     property Tilesize: integer read FTilesize write FTilesize;
@@ -38,6 +41,7 @@ type
     property Name: string read FName write FName;
     property Width: integer read  FWidth write FWidth;
     property Height: integer read  FHeight write FHeight;
+    property Scale: integer read  FScale write FScale;
     function Load(filename: string): TLevel;
   end;
 
@@ -47,7 +51,12 @@ constructor TLevel.Create(numLayers: integer);
 begin
   SetLength(FLayers, numLayers);
   SetLength(FData, numLayers);
+  FScale := 1;
+end;
 
+function TLevel.GetTileScale: integer;
+begin
+  result := FTilesize * FScale;
 end;
 
 function TLevel.LayerCount(): integer;
