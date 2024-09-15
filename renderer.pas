@@ -5,34 +5,36 @@ unit renderer;
 interface
 
 uses
-  Classes, SysUtils,OpenGLContext, GL, glu, BGRABitmap, Texture, dialogs;
+  Classes, SysUtils, OpenGLContext, GL, glu, BGRABitmap, Texture, Dialogs;
 
 type
-  TIntegerArray = array of array of Integer;
+  TIntegerArray = array of array of integer;
 
   TRenderer = class
-     procedure Mode2D;
-     procedure ClearScreen;
-     procedure Draw;
-     procedure DrawTilemap(arr: TIntegerArray; texture: TTexture; t: integer);
-     function glGetViewportWidth: Integer;
-     function glGetViewportHeight: Integer;
-     function LoadGLTexture(const FileName: String): GLuint;
+    procedure Mode2D;
+    procedure ClearScreen;
+    procedure Draw;
+    procedure DrawTilemap(arr: TIntegerArray; texture: TTexture; t: integer);
+    procedure DrawGrid(Width: integer; Height: integer; t: integer);
+    procedure DrawBackground(Width: integer; Height: integer; t: integer);
+    function glGetViewportWidth: integer;
+    function glGetViewportHeight: integer;
+    function LoadGLTexture(const FileName: string): GLuint;
   end;
 
 implementation
 
-function TRenderer.glGetViewportWidth: Integer;
+function TRenderer.glGetViewportWidth: integer;
 var
-  Rect: array[0..3] of Integer;
+  Rect: array[0..3] of integer;
 begin
   glGetIntegerv(GL_VIEWPORT, @Rect);
   Result := Rect[2] - Rect[0];
 end;
 
-function TRenderer.glGetViewportHeight: Integer;
+function TRenderer.glGetViewportHeight: integer;
 var
-  Rect: array[0..3] of Integer;
+  Rect: array[0..3] of integer;
 begin
   glGetIntegerv(GL_VIEWPORT, @Rect);
   Result := Rect[3] - Rect[1];
@@ -46,31 +48,27 @@ var
   x, y: integer;
   t: integer;
   c: integer;
-  tiles: array[0..4,0..9] of Integer = (
-    (1,1,1,1,1,1,1,1,1,1),
-    (1,0,0,0,1,0,1,0,0,1),
-    (1,0,0,0,1,0,1,0,0,1),
-    (1,0,0,0,0,0,0,0,0,1),
-    (1,1,1,1,1,1,1,1,1,1)
-  );
+  tiles: array[0..4, 0..9] of integer = ((1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    (1, 0, 0, 0, 1, 0, 1, 0, 0, 1), (1, 0, 0, 0, 1, 0, 1, 0, 0, 1), (1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+    (1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
 begin
-  t:=32;
+  t := 32;
   _width := 10;
   _height := 5;
   ClearScreen;
   Mode2D;
   glBegin(GL_QUADS);
-     for h:=0 to _height - 1 do
-     begin
-       for w:=0 to _width - 1 do
-       begin
-         glColor3f(1, tiles[h][w], 0);
-         glVertex3f(w*t,h*t,0);
-         glVertex3f(w*t,h*t+t,0);
-         glVertex3f(w*t+t,h*t+t,0);
-         glVertex3f(w*t+t,h*t,0);
-       end;
-     end;
+  for h := 0 to _height - 1 do
+  begin
+    for w := 0 to _width - 1 do
+    begin
+      glColor3f(1, tiles[h][w], 0);
+      glVertex3f(w * t, h * t, 0);
+      glVertex3f(w * t, h * t + t, 0);
+      glVertex3f(w * t + t, h * t + t, 0);
+      glVertex3f(w * t + t, h * t, 0);
+    end;
+  end;
   glEnd;
 end;
 
@@ -95,49 +93,88 @@ end;
 
 procedure TRenderer.DrawTilemap(arr: TIntegerArray; texture: TTexture; t: integer);
 var
-  h,w: integer;
+  h, w: integer;
   tile: integer;
   srcX, srcY: real;
   srcW, srcH: real;
 begin
   //ClearScreen;
   //Mode2D;
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture.Id);
-  glColor3f(1,1,1);
+  glColor3f(1, 1, 1);
   glBegin(GL_QUADS);
-       for h:=Low(arr) to High(arr) do
-       begin
-         for w:=Low(arr[h]) to High(arr[h]) do
-         begin
-           if (arr[h][w] < 0 ) then
-           begin
-             continue;
-           end;
-           srcY := (arr[h][w] div (texture.Width div t) * t) / texture.Height;
-           srcX := (arr[h][w] mod (texture.Width div t) * t) / texture.Width;
-           srcW := t / texture.Width;
-           srcH := t / texture.Height;
-           //glColor3f(1, arr[h][w], 0);
-           tile := t;
-           //**
-           glTexCoord2f(srcX, srcY);
-           glVertex3f(w*tile,h*tile,0);
-           //**
-           glTexCoord2f(srcX, srcY + srcH);
-           glVertex3f(w*tile,h*tile+tile,0);
-           //**
-           glTexCoord2f(srcX + srcW, srcY + srcH);
-           glVertex3f(w*tile+tile,h*tile+tile,0);
-           //**
-           glTexCoord2f(srcX + srcW, srcY);
-           glVertex3f(w*tile+tile,h*tile,0);
-         end;
-       end;
-    glEnd;
+  for h := Low(arr) to High(arr) do
+  begin
+    for w := Low(arr[h]) to High(arr[h]) do
+    begin
+      if (arr[h][w] < 0) then
+      begin
+        continue;
+      end;
+      srcY := (arr[h][w] div (texture.Width div t) * t) / texture.Height;
+      srcX := (arr[h][w] mod (texture.Width div t) * t) / texture.Width;
+      srcW := t / texture.Width;
+      srcH := t / texture.Height;
+      //glColor3f(1, arr[h][w], 0);
+      tile := t;
+      //**
+      glTexCoord2f(srcX, srcY);
+      glVertex3f(w * tile, h * tile, 0);
+      //**
+      glTexCoord2f(srcX, srcY + srcH);
+      glVertex3f(w * tile, h * tile + tile, 0);
+      //**
+      glTexCoord2f(srcX + srcW, srcY + srcH);
+      glVertex3f(w * tile + tile, h * tile + tile, 0);
+      //**
+      glTexCoord2f(srcX + srcW, srcY);
+      glVertex3f(w * tile + tile, h * tile, 0);
+    end;
+  end;
+  glEnd;
 end;
 
-function TRenderer.LoadGLTexture(const FileName: String): GLuint;
+procedure TRenderer.DrawGrid(Width: integer; Height: integer; t: integer);
+var
+  w, h, tile: integer;
+begin
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glColor3f(0, 0, 0);
+  glBegin(GL_QUADS);
+  for h := 0 to Height - 1 do
+  begin
+    for w := 0 to Width - 1 do
+    begin
+      tile := t;
+      //**
+      glVertex3f(w * tile, h * tile, 0);
+      //**
+      glVertex3f(w * tile, h * tile + tile, 0);
+      //**
+      glVertex3f(w * tile + tile, h * tile + tile, 0);
+      //**
+      glVertex3f(w * tile + tile, h * tile, 0);
+    end;
+  end;
+  glEnd;
+end;
+
+procedure TRenderer.DrawBackground(Width: integer; Height: integer; t: integer);
+begin
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBegin(GL_QUADS);
+    glColor3f(0.5,0.5,0.5);
+      glVertex3f(0, 0, 0);
+      glVertex3f(0, Height *t, 0);
+      glVertex3f(Width * t, Height * t, 0);
+      glVertex3f(Width * t, 0, 0);
+  glEnd;
+end;
+
+function TRenderer.LoadGLTexture(const FileName: string): GLuint;
 var
   Bitmap: TBGRABitmap;
   TextureID: GLuint;
@@ -167,7 +204,8 @@ begin
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Load the texture data into OpenGL
-    glTexImage2D(GL_TEXTURE_2D, 0, PixelFormat, Bitmap.Width, Bitmap.Height, 0, PixelFormat, GL_UNSIGNED_BYTE, Data);
+    glTexImage2D(GL_TEXTURE_2D, 0, PixelFormat, Bitmap.Width,
+      Bitmap.Height, 0, PixelFormat, GL_UNSIGNED_BYTE, Data);
 
     Result := TextureID;
 
@@ -178,4 +216,3 @@ end;
 
 
 end.
-

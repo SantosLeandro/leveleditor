@@ -67,6 +67,11 @@
         <Filename Value="layer.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="vector2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Vector2"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

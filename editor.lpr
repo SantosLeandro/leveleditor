@@ -3,23 +3,26 @@ program editor;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}
+ {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}
-  {$IFDEF HASAMIGA}
+   {$ENDIF} {$IFDEF HASAMIGA}
   athreads,
-  {$ENDIF}
+   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, lazopenglcontext, main, loader, texture, level, layer
-  { you can add units after this };
+  Forms,
+  lazopenglcontext,
+  main,
+  loader,
+  texture,
+  level,
+  layer, vector2 { you can add units after this };
 
 {$R *.res}
 
 begin
-  RequireDerivedFormResource:=True;
-  Application.Scaled:=True;
+  RequireDerivedFormResource := True;
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TFormMain, FormMain);
   Application.Run;
 end.
-

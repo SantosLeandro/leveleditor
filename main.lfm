@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 295
+  Left = 333
   Height = 705
-  Top = 127
+  Top = 161
   Width = 1123
   Caption = 'Editor'
   ClientHeight = 680
@@ -20,22 +20,17 @@ object FormMain: TFormMain
     ClientHeight = 680
     ClientWidth = 288
     TabOrder = 0
-    object ListBox1: TListBox
+    object ListBoxLayers: TListBox
       Left = 11
       Height = 150
       Top = 38
       Width = 266
       Align = alTop
       BorderSpacing.Around = 10
-      Items.Strings = (
-        'Background_0'
-        'Background_1'
-        'Objects'
-        'Foreground_0'
-        'Foreground_1'
-      )
-      ItemHeight = 23
+      ItemHeight = 0
+      OnSelectionChange = ListBoxLayersSelectionChange
       TabOrder = 0
+      TopIndex = -1
     end
     object Label1: TLabel
       Left = 11
@@ -53,11 +48,14 @@ object FormMain: TFormMain
     Top = 0
     Width = 835
     Align = alClient
+    AutoResizeViewport = True
     OpenGLMajorVersion = 2
     OnClick = GLBoxClick
     OnKeyDown = GLBoxKeyDown
+    OnKeyUp = GLBoxKeyUp
     OnMouseDown = GLBoxMouseDown
     OnMouseMove = GLBoxMouseMove
+    OnMouseUp = GLBoxMouseUp
     OnPaint = GLBoxPaint
   end
   object MainMenu: TMainMenu
@@ -68,8 +66,9 @@ object FormMain: TFormMain
       object MenuItem2: TMenuItem
         Caption = 'New'
       end
-      object MenuItem3: TMenuItem
+      object MenuItemOpen: TMenuItem
         Caption = 'Open'
+        OnClick = MenuItemOpenClick
       end
       object MenuItem4: TMenuItem
         Caption = 'Save'
@@ -81,5 +80,10 @@ object FormMain: TFormMain
         Caption = 'Exit'
       end
     end
+  end
+  object OpenDialog: TOpenDialog
+    Filter = 'json|*.json'
+    Left = 960
+    Top = 8
   end
 end

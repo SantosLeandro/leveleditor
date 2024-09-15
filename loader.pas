@@ -5,10 +5,10 @@ unit loader;
 interface
 
 uses
-    GL, GLu, Graphics, FPImage, FPReadPNG, FPReadJPEG, BGRABitmapPack,BGRABitmap, Classes,sysutils;
+  GL, GLu, Graphics, FPImage, FPReadPNG, FPReadJPEG, BGRABitmapPack, BGRABitmap,
+  Classes, SysUtils;
 
 implementation
 
 
 end.
-
