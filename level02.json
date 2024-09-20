@@ -1,0 +1,24 @@
+{
+   "app":"LevelEditor",
+   "version":"0.01",
+   "tilesize":"16",
+   "width":"20",
+   "height":"10",
+   "name":"DemoLevel01",
+   "layer":[
+    {
+        "name":"background",
+        "width":"20",
+        "height":"10",
+        "texture":"tileset_1616.png",
+        "data":"6,6,6,6,6,6,6,6,6,6,6,-1,-1,-1,-1,-1,-1,-1,-1,6,6,-1,-1,-1,-1,-1,-1,-1,-1,6,6,-1,-1,-1,-1,-1,-1,-1,-1,6,6,6,6,6,6,6,6,6,6,6,6",
+        "gameobject":[
+            { "name":"player", "x":"10", "y":"10" },
+            { "name":"coin", "x":"16", "y":"10" },
+            { "name":"enemy1", "x":"32", "y":"10" },
+            { "name":"enemy1", "x":"128", "y":"10" }
+        ]
+    }
+   ]
+
+}

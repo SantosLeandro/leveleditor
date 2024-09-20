@@ -6,18 +6,28 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, OpenGLContext,
-  GL, glu, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, Vector2,FileHelper,
-  ComCtrls, BCListBox, BGRASpriteAnimation, BGRABitmap, BCTypes;
+  GL, glu,glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, GameObject, Vector2,FileHelper,
+  ComCtrls, BCListBox, BGRASpriteAnimation, BGRABitmap, BCTypes, Types;
 
 type
-
+  EditingMode = (ED_TILEMAP, ED_GAMEOBJECT);
   { TFormMain }
 
   TFormMain = class(TForm)
-    PageControl1: TPageControl;
+    BtnApply: TButton;
+    EdtLvlWidth: TLabeledEdit;
+    EdtLvlHeight: TLabeledEdit;
+    EdtLvlName: TLabeledEdit;
+    EdtLvlTilesize: TLabeledEdit;
+    ListBoxObject: TListBox;
+    MemoProps: TMemo;
+    MainPageControl: TPageControl;
+    RadioEditing: TRadioGroup;
+    SaveDialog: TSaveDialog;
     ScrollBox1: TScrollBox;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
+    TabTileset: TTabSheet;
+    TabGameObject: TTabSheet;
+    TabLevel: TTabSheet;
     Tileset: TBGRASpriteAnimation;
     GLBox: TOpenGLControl;
     Label1: TLabel;
@@ -26,12 +36,12 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItemOpen: TMenuItem;
-    MenuItem4: TMenuItem;
-    MenuItem5: TMenuItem;
+    MenuItemSave: TMenuItem;
+    MenuItemSaveAs: TMenuItem;
     MenuItem6: TMenuItem;
     LeftPanel: TPanel;
     OpenDialog: TOpenDialog;
-    StatusBar1: TStatusBar;
+    MainStatusBar: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure GLBoxClick(Sender: TObject);
@@ -43,9 +53,19 @@ type
       );
     procedure GLBoxMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure GLBoxMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure GLBoxMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
+    procedure MenuItemSaveAsClick(Sender: TObject);
+    procedure MenuItemSaveClick(Sender: TObject);
     procedure MenuItemOpenClick(Sender: TObject);
+    procedure RadioEditingItemEnter(Sender: TObject);
+    procedure RadioEditingSelectionChanged(Sender: TObject);
+    procedure TabLevelContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
     procedure TilesetClick(Sender: TObject);
     procedure TilesetMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -71,12 +91,17 @@ type
     CanMove: boolean;
     MouseLeftBtn: boolean;
     MouseMiddleBtn: boolean;
+    MouseRightBtn: boolean;
     Scale: integer;
     TileId: integer;
+    GameObjects: TArrayGameObject;
+    EdMode: string;
     function getTestMap: TIntegerArray;
     procedure InitLevel;
 
   end;
+
+
 
 var
   FormMain: TFormMain;
@@ -110,6 +135,7 @@ end;
 procedure TFormMain.InitLevel;
 var
   i: integer;
+
 begin
     LevelFile := TLevelFile.Create;
     //Level := Level.Load('level.json');
@@ -126,6 +152,15 @@ begin
     begin
        ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
     end;
+
+    GameObjects := LevelFile.LoadGameObject('gameobject.json');
+
+    for i:= 0 to High(GameObjects) do
+    begin
+      ListBoxObject.AddItem(GameObjects[i].Name,GameObjects[i]);
+    end;
+
+    ListBoxObject.ItemIndex:= 0;
 end;
 
 { TFormMain }
@@ -143,6 +178,7 @@ begin
   GLBox.OnMouseMove := @GLBoxMouseMove;
   GLBox.OnKeyDown := @GLBoxKeyDown;
   GLBox.OnKeyUp := @GLBoxKeyUp;
+  GLBox.OnMouseWheel := @GLBoxMouseWheel;
   Renderer := TRenderer.Create;
   canMove := false;
   scale := 1;
@@ -150,8 +186,8 @@ begin
   OffsetY:=0;
   LayerId := 0;
   InitLevel;
-
-
+  EdMode := 'tile';
+  MouseRightBtn:=false;
 
 end;
 
@@ -163,35 +199,13 @@ end;
 
 procedure TFormMain.GLBoxClick(Sender: TObject);
 begin
-  showMessage('click');
+
 end;
 
 procedure TFormMain.GLBoxKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  //if key = 17 then
-  //begin
-  //   GLBox.Cursor:= crSizeAll;
-  //   canMove := true;
-  //end;
-  //
-  //if key = 37 then
-  //begin
-  // OffsetX := OffsetX - Level.Tilesize;
-  //end;
-  //if key = 39 then
-  //begin
-  // OffsetX := OffsetX + Level.Tilesize;
-  //end;
-  //
-  //if key = 38 then
-  //begin
-  // OffsetY := OffsetY - Level.Tilesize;
-  //end;
-  //if key = 40 then
-  //begin
-  // OffsetY := OffsetY + Level.Tilesize;
-  //end;
+
 end;
 
 procedure TFormMain.GLBoxKeyUp(Sender: TObject; var Key: Word;
@@ -209,20 +223,49 @@ procedure TFormMain.GLBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
    posX, posY: integer;
+   objX, objY: integer;
+   goName: string;
 begin
    MouseLeftBtn := false;
-   posX := (x - offsetX) div Level.tileSize;
-   posY := (y - offsetY) div Level.tileSize;
+   posX := (x - offsetX) div (Level.tileSize * Scale);
+   posY := (y - offsetY) div (Level.tileSize * Scale);
    if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
    begin
     if Button = mbLeft then
        begin
           MouseLeftBtn := true;
-          Level.Layer[LayerId].Data[posY][posX] := tileID;
+
+          if (EdMode = 'tile') then
+          begin
+            Level.Layer[LayerId].Data[posY][posX] := tileID;
+          end
+          else
+          begin
+            goName := ListBoxObject.GetSelectedText;
+            objX := posX * (Level.tileSize);
+            objY := posY * (Level.tileSize);
+            Level.Layer[LayerId].AddGameObject(objX,objY,
+            LevelFile.GetSprite(goName).w,
+            LevelFile.GetSprite(goName).h,
+            goName);
+          end;
+
        end;
     if Button = mbRight then
        begin
-          Level.Layer[LayerId].Data[posY][posX] := -1;
+          MouseRightBtn := true;
+          if (EdMode = 'tile') then
+          begin
+            Level.Layer[LayerId].Data[posY][posX] := -1;
+          end
+          else
+          begin
+            //objX :=  posX * level.tilesize;
+            //objY :=  posY * level.tilesize;
+            objx := (x - offsetx) div scale;
+            objy := (y - offsety) div scale;
+            Level.Layer[LayerId].RemoveGameObject(objX,objY);
+          end;
        end;
        GLBox.invalidate;
    end;
@@ -238,31 +281,61 @@ end;
 procedure TFormMain.GLBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 var
-   movex,movey: integer;
+   deltax,deltay: integer;
+   objx,objy:integer;
+   posX, posY: integer;
 begin
-
-   if MouseMiddleBtn then
-   begin
-     if( x > OldMouseX) then
-         OffsetX := OffsetX + 4;
-     if ( x < OldMouseX) then
-         OffsetX := OffsetX - 4;
-     if( y > OldMouseY) then
-         OffsetY := OffsetY + 4;
-     if ( y < OldMouseY) then
-         OffsetY := OffsetY - 4;
+     DeltaX := X - OldMouseX;
+     DeltaY := Y - OldMouseY;
      OldMouseX := X;
      OldMouseY := Y;
-   end;
-   MouseX := (x - OffsetX) div Level.tileSize * Level.tileSize;
-   MouseY := (y - OffsetY) div Level.tileSize * Level.tileSize;
-   GLBox.Invalidate;
+     if MouseMiddleBtn then
+     begin
+      OffsetX := OffsetX + DeltaX;
+      OffsetY := OffsetY + DeltaY;
+     end;
+
+     if MouseLeftBtn = true then
+     begin
+        posX := (x - offsetX) div (Level.tileSize * Scale);
+        posY := (y - offsetY) div (Level.tileSize * Scale);
+        if (EdMode = 'tile') then
+        begin
+           Level.Layer[LayerId].Data[posY][posX] := tileID;
+        end
+     end;
+
+     if MouseRightBtn = true then
+     begin
+        posX := (x - offsetX) div (Level.tileSize * Scale);
+        posY := (y - offsetY) div (Level.tileSize * Scale);
+        if (EdMode = 'tile') then
+        begin
+           Level.Layer[LayerId].Data[posY][posX] := -1;
+        end
+     end;
+
+     MouseX := (x - OffsetX) div (Level.tileSize * Scale) * (Level.tileSize*Scale);
+     MouseY := (y - OffsetY) div (Level.tileSize * Scale) * (Level.tileSize*Scale);
+
+     objx := (x - offsetx) div scale;
+     objy := (y - offsety) div scale;
+     MainStatusBar.SimpleText := 'x '+IntToStr(objx)+' | y '+IntToStr(objy);
+     GLBox.Invalidate;
 end;
 
 procedure TFormMain.GLBoxMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-   MouseLeftBtn := (Button = mbLeft) and MouseLeftBtn = false;
+   if Button = mbLeft then
+   begin
+     MouseLeftBtn := false;
+   end;
+
+   if Button = mbRight then
+   begin
+     MouseRightBtn := false;
+   end;
 
    if Button = mbMiddle then
    begin
@@ -271,15 +344,41 @@ begin
 
 end;
 
+procedure TFormMain.GLBoxMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  if WheelDelta > 0 then
+  begin
+    scale := scale + 1;
+  end
+  else if (WheelDelta < 0) and (scale > 1) then
+  begin
+     scale := scale - 1;
+  end;
+  Renderer.Scale := scale;
+  GLBox.Invalidate;
+end;
+
+procedure TFormMain.GLBoxMouseWheelDown(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+
+end;
+
 procedure TFormMain.GLBoxPaint(Sender: TObject);
 var
    i: integer;
+   j: integer;
+   go: TSprite;
 begin
-  if(texture = nil) then
+  go.x := 16;
+  go.y := 16;
+  go.w := 16;
+  go.h := 64;
+  if(texture.id = 0) then
   begin
    texture := TTexture.Create();
-   texture.LoadFromFile('nature.png');
-   Level.Layer[LayerId].Texture := texture;
+   texture.LoadFromFile('gameobject.png');
   end;
 
   // prepare to draw
@@ -287,8 +386,8 @@ begin
   glEnable( GL_BLEND );
   Renderer.ClearScreen;
   Renderer.Mode2D;
+  //glScalef(scale,scale,0);
   glTranslatef(offsetX,offsetY,0);
-  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 
   // draw level
   if( level <> nil ) then
@@ -297,7 +396,16 @@ begin
     Renderer.DrawGrid(level.width,level.height,Level.TileSize);
     for i := 0 to Level.LayerCount do
     begin
-      Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[LayerId].texture,Level.Tilesize * scale);
+      Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
+      for j:=0 to High(Level.Layer[layerId].GameObject) do
+      begin
+         if (Level.Layer[i].GameObject[j] <> nil) then
+         Renderer.DrawGameObject(
+           Level.Layer[i].GameObject[j].x,
+           Level.Layer[i].GameObject[j].y,
+           LevelFile.GetSprite(Level.Layer[i].GameObject[j].Name),
+           Texture);
+      end;
     end;
    end;
 
@@ -306,9 +414,9 @@ begin
    glColor4f(1,1,0,0.2);
    glBegin(GL_QUADS);
      glVertex3f(mouseX, mouseY,0);
-     glVertex3f(mouseX+Level.Tilesize, mouseY,0);
-     glVertex3f(mouseX+Level.Tilesize, mouseY+Level.Tilesize,0);
-     glVertex3f(mouseX, mouseY+Level.Tilesize,0);
+     glVertex3f(mouseX+Level.Tilesize * Scale, mouseY,0);
+     glVertex3f(mouseX+Level.Tilesize * Scale, mouseY+Level.Tilesize * Scale,0);
+     glVertex3f(mouseX, mouseY+Level.Tilesize * Scale,0);
    glEnd();
 
   // present renderer
@@ -322,6 +430,19 @@ begin
   begin
     Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
   end;
+end;
+
+procedure TFormMain.MenuItemSaveAsClick(Sender: TObject);
+begin
+   if SaveDialog.Execute then
+   begin
+     LevelFile.Save(SaveDialog.filename,Level);
+   end;
+end;
+
+procedure TFormMain.MenuItemSaveClick(Sender: TObject);
+begin
+    LevelFile.Save('testSave.json',Level);
 end;
 
 procedure TFormMain.MenuItemOpenClick(Sender: TObject);
@@ -338,10 +459,41 @@ begin
         begin
            ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
         end;
+        Tileset.Invalidate;
+        EdtLvlWidth.Text := IntToStr(Level.Width);
+        EdtLvlHeight.Text := IntToStr(Level.Height);
+        EdtLvlTilesize.Text := IntToStr(Level.Tilesize);
+        EdtLvlName.Text := Level.Name;
+        MemoProps.Append(Level.Props);
     end
     else
       ShowMessage('No file selected');
     end;
+
+procedure TFormMain.RadioEditingItemEnter(Sender: TObject);
+begin
+
+end;
+
+procedure TFormMain.RadioEditingSelectionChanged(Sender: TObject);
+begin
+   if RadioEditing.ItemIndex = 0 then
+   begin
+      EdMode := 'tile';
+      MainPageControl.ActivePage :=TabTileset;
+   end
+   else
+   begin
+      MainPageControl.ActivePage :=TabGameObject;
+      EdMode := 'object';
+   end;
+end;
+
+procedure TFormMain.TabLevelContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
+end;
 
 procedure TFormMain.TilesetClick(Sender: TObject);
 begin

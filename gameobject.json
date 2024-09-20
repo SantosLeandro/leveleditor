@@ -3,13 +3,38 @@
     "gameobjects":[
         {
             "name":"player",
-            "width":"32",
-            "height":"64"
+            "x":"0",
+            "y":"0",
+            "width":"16",
+            "height":"32"
         },
         {
-            "name":"enemy",
-            "width":"32",
-            "height":"64"
+            "name":"enemy1",
+            "x":"16",
+            "y":"0",
+            "width":"16",
+            "height":"16"
+        },
+        {
+            "name":"enemy2",
+            "x":"16",
+            "y":"16",
+            "width":"16",
+            "height":"32"
+        },
+        {
+            "name":"coin",
+            "x":"32",
+            "y":"0",
+            "width":"16",
+            "height":"16"
+        },
+        {
+            "name":"mushroom",
+            "x":"32",
+            "y":"16",
+            "width":"16",
+            "height":"16"
         }
     ]
 }

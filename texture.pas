@@ -16,7 +16,7 @@ type
     FHeight: integer;
     FBitmap: TBGRABitmap;
   public
-
+    Name: string;
     constructor Create;
     destructor Destroy; override;
 
@@ -55,6 +55,7 @@ var
 begin
   // Load image using BGRABitmap
   Bitmap := TBGRABitmap.Create(FileName);
+  Name := Filename;
   try
     FWidth := Bitmap.Width;
     FHeight := Bitmap.Height;
@@ -69,8 +70,8 @@ begin
     glBindTexture(GL_TEXTURE_2D, FTextureID);
 
     // Set texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

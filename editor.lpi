@@ -80,6 +80,10 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="FileHelper"/>
       </Unit>
+      <Unit>
+        <Filename Value="gameobject.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

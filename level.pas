@@ -10,6 +10,10 @@ uses
 type
   TIntegerArray = array of array of integer;
 
+  TBGColor = record
+    r,g,b:real;
+  end;
+
   TLevel = class
   protected
     FData: array of TLayer;
@@ -19,11 +23,12 @@ type
     FWidth: integer;
     FHeight: integer;
     FScale: integer;
+    FProps: string;
     procedure SetData(Index: integer; l: TLayer);
     function GetData(Index: integer): TLayer;
 
-
   public
+    //BackgroundColor: TBGColor;
     constructor Create(numLayers: integer);
     procedure AddLayer(w: integer; h: integer);
     procedure SwapLayer(First: integer; second: integer);
@@ -37,11 +42,13 @@ type
     procedure SetLayer(Index: integer; arr: TIntegerArray);
     //property Layer[index: integer]: TIntegerArray read GetLayer write SetLayer;
     property Tilesize: integer read FTilesize write FTilesize;
+    property TilesizeScaled: integer read GetTileScale;
     property Layer[index: integer]: TLayer read GetData write SetData;
     property Name: string read FName write FName;
     property Width: integer read  FWidth write FWidth;
     property Height: integer read  FHeight write FHeight;
     property Scale: integer read  FScale write FScale;
+    property Props: string read  FProps write FProps;
     function Load(filename: string): TLevel;
   end;
 
@@ -52,6 +59,7 @@ begin
   SetLength(FLayers, numLayers);
   SetLength(FData, numLayers);
   FScale := 1;
+  FProps := '{"bgm":"song.wav"}';
 end;
 
 function TLevel.GetTileScale: integer;
