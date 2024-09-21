@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="editor.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos Y="28"/>
+        <UsageCount Value="142"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormMain"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="366"/>
+        <CursorPos X="5" Y="389"/>
+        <UsageCount Value="142"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="loader.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="7"/>
+        <CursorPos X="21" Y="9"/>
+        <UsageCount Value="142"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="renderer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="111"/>
+        <CursorPos Y="129"/>
+        <UsageCount Value="142"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="texture.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Texture"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="52"/>
+        <CursorPos X="20" Y="58"/>
+        <UsageCount Value="137"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="level.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="22"/>
+        <CursorPos X="31" Y="62"/>
+        <UsageCount Value="131"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="layer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="87"/>
+        <CursorPos X="29" Y="100"/>
+        <UsageCount Value="123"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="vector2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Vector2"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="21" Y="11"/>
+        <UsageCount Value="92"/>
+      </Unit>
+      <Unit>
+        <Filename Value="filehelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="FileHelper"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="212"/>
+        <CursorPos X="91" Y="220"/>
+        <UsageCount Value="80"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="gameobject.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="14"/>
+        <CursorPos X="13" Y="41"/>
+        <UsageCount Value="62"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/share/fpcsrc/3.2.2/packages/fv/src/menus.pas"/>
+        <UnitName Value="Menus"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="59"/>
+        <CursorPos X="11" Y="74"/>
+        <UsageCount Value="6"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgragraphics.pas"/>
+        <UnitName Value="BGRAGraphics"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="2"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgradefaultbitmap.pas"/>
+        <UnitName Value="BGRADefaultBitmap"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="18"/>
+        <CursorPos X="30" Y="33"/>
+        <UsageCount Value="3"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgrabitmaptypes.pas"/>
+        <UnitName Value="BGRABitmapTypes"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="28" Y="25"/>
+        <UsageCount Value="7"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bcbasectrls.pas"/>
+        <UnitName Value="BCBaseCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5"/>
+        <CursorPos X="84" Y="20"/>
+        <UsageCount Value="7"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bctypes.pas"/>
+        <UnitName Value="BCTypes"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="40" Y="19"/>
+        <UsageCount Value="7"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/share/fpcsrc/3.2.2/packages/xforms/examples/canvas.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="17"/>
+        <CursorPos X="19" Y="32"/>
+        <UsageCount Value="7"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bgraspriteanimation.pas"/>
+        <UnitName Value="BGRASpriteAnimation"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="9"/>
+        <CursorPos X="97" Y="24"/>
+        <UsageCount Value="7"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-json/src/fpjson.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1460"/>
+        <CursorPos Y="1480"/>
+        <UsageCount Value="12"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../level_editor/Editor/ufilehelper.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="111"/>
+        <CursorPos X="17" Y="119"/>
+        <UsageCount Value="10"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="renderer.pas"/>
+        <Caret Line="111" Column="12" TopLine="100"/>
+      </Position>
+      <Position>
+        <Filename Value="renderer.pas"/>
+        <Caret Line="144" Column="9" TopLine="114"/>
+      </Position>
+      <Position>
+        <Filename Value="renderer.pas"/>
+        <Caret Line="145" Column="9" TopLine="117"/>
+      </Position>
+      <Position>
+        <Filename Value="renderer.pas"/>
+        <Caret Line="146" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="182" Column="20" TopLine="169"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="184" Column="20" TopLine="184"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="401" Column="32" TopLine="401"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="402" Column="32" TopLine="402"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="401" Column="32" TopLine="401"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="401" Column="32" TopLine="401"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="402" Column="32" TopLine="402"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="401" Column="32" TopLine="401"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="402" Column="32" TopLine="402"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="401" Column="32" TopLine="401"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="429" Column="37" TopLine="404"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="25" Column="8" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="editor.lpr"/>
+        <Caret Line="28"/>
+      </Position>
+      <Position>
+        <Filename Value="filehelper.pas"/>
+        <Caret Line="96" Column="58" TopLine="80"/>
+      </Position>
+      <Position>
+        <Filename Value="filehelper.pas"/>
+        <Caret Line="97" Column="53" TopLine="79"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="362" TopLine="344"/>
+      </Position>
+      <Position>
+        <Filename Value="renderer.pas"/>
+        <Caret Line="154" Column="20" TopLine="131"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="62" Column="31" TopLine="43"/>
+      </Position>
+      <Position>
+        <Filename Value="filehelper.pas"/>
+        <Caret Line="228" Column="43" TopLine="209"/>
+      </Position>
+      <Position>
+        <Filename Value="renderer.pas"/>
+        <Caret Line="154" Column="28" TopLine="143"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="363" TopLine="149"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="8" Column="78"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="438" Column="3" TopLine="436"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="442" Column="124" TopLine="166"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="281" Column="24" TopLine="282"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="389" Column="5" TopLine="366"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
