@@ -386,7 +386,7 @@ begin
   glEnable( GL_BLEND );
   Renderer.ClearScreen;
   Renderer.Mode2D;
-  glScalef(scale,scale,0);
+  //glScalef(scale,scale,0);
   glTranslatef(offsetX,offsetY,0);
 
   // draw level
