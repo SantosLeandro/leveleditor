@@ -1,4 +1,5 @@
 # LevelEditor
+![alt text](https://github.com/SantosLeandro/leveleditor/blob/main/docs/img/preview.png?raw=true)
 
 Editor genérico de tilemaps
 
