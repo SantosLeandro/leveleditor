@@ -8,6 +8,10 @@ uses
   Classes, SysUtils, fpjson, jsonparser, jsonConf, layer, Dialogs, fgl, texture;
 
 type
+  TAction = record
+    layer, tile, r, c: integer;
+  end;
+
   TIntegerArray = array of array of integer;
 
   TBGColor = record
@@ -24,8 +28,11 @@ type
     FHeight: integer;
     FScale: integer;
     FProps: string;
+    FActions: array of TAction;
+    FActionCount: integer;
     procedure SetData(Index: integer; l: TLayer);
     function GetData(Index: integer): TLayer;
+
 
   public
     //BackgroundColor: TBGColor;
@@ -50,6 +57,8 @@ type
     property Scale: integer read  FScale write FScale;
     property Props: string read  FProps write FProps;
     function Load(filename: string): TLevel;
+    function Undo(out A: TAction): Boolean;
+    procedure SaveCommand(l: integer; tile: integer; w: integer; h: integer);
   end;
 
 implementation
@@ -58,6 +67,8 @@ constructor TLevel.Create(numLayers: integer);
 begin
   SetLength(FLayers, numLayers);
   SetLength(FData, numLayers);
+  SetLength(FActions, 100);
+  FActionCount := 0;
   FScale := 1;
   FProps := '{"bgm":"song.wav"}';
 end;
@@ -128,6 +139,24 @@ end;
 procedure TLevel.InsertTile(index: integer; w: integer; h: integer; tile: integer);
 begin
   FLayers[index][h][w] := tile;
+end;
+
+procedure TLevel.SaveCommand(l: integer; tile: integer; w: integer; h: integer);
+begin
+  FActions[FActionCount].layer := l;
+  FActions[FActionCount].tile  := tile;
+  FActions[FActionCount].r     := h;
+  FActions[FActionCount].c     := w;
+  FActionCount := FActionCount + 1;
+end;
+
+function TLevel.Undo(out A: TAction): Boolean;
+begin
+  Result := FActionCount > 0;
+  if not Result then Exit;
+
+  Dec(FActionCount);
+  A := FActions[FActionCount];
 end;
 
 function TLevel.Load(filename: string): TLevel;

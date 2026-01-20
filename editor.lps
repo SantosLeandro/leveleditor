@@ -8,8 +8,8 @@
         <Filename Value="editor.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos Y="22"/>
-        <UsageCount Value="142"/>
+        <CursorPos X="41" Y="20"/>
+        <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -19,9 +19,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="386"/>
-        <CursorPos Y="399"/>
-        <UsageCount Value="142"/>
+        <TopLine Value="300"/>
+        <CursorPos X="16" Y="311"/>
+        <UsageCount Value="159"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -30,15 +30,16 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="7"/>
         <CursorPos X="21" Y="9"/>
-        <UsageCount Value="142"/>
+        <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="renderer.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
-        <CursorPos X="44" Y="8"/>
-        <UsageCount Value="142"/>
+        <TopLine Value="90"/>
+        <CursorPos Y="129"/>
+        <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -48,25 +49,25 @@
         <EditorIndex Value="6"/>
         <TopLine Value="52"/>
         <CursorPos X="20" Y="58"/>
-        <UsageCount Value="137"/>
+        <UsageCount Value="154"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="level.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="22"/>
-        <CursorPos X="31" Y="62"/>
-        <UsageCount Value="131"/>
+        <TopLine Value="48"/>
+        <CursorPos X="14" Y="60"/>
+        <UsageCount Value="148"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="layer.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="87"/>
+        <TopLine Value="110"/>
         <CursorPos X="29" Y="100"/>
-        <UsageCount Value="123"/>
+        <UsageCount Value="140"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -75,7 +76,7 @@
         <UnitName Value="Vector2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="21" Y="11"/>
-        <UsageCount Value="92"/>
+        <UsageCount Value="109"/>
       </Unit>
       <Unit>
         <Filename Value="filehelper.pas"/>
@@ -84,7 +85,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="212"/>
         <CursorPos X="91" Y="220"/>
-        <UsageCount Value="80"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -93,7 +94,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="14"/>
         <CursorPos X="13" Y="41"/>
-        <UsageCount Value="62"/>
+        <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -102,13 +103,13 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos X="11" Y="74"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgragraphics.pas"/>
         <UnitName Value="BGRAGraphics"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgradefaultbitmap.pas"/>
@@ -116,7 +117,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="18"/>
         <CursorPos X="30" Y="33"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgrabitmaptypes.pas"/>
@@ -124,7 +125,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
         <CursorPos X="28" Y="25"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bcbasectrls.pas"/>
@@ -132,7 +133,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="84" Y="20"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -141,7 +142,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="40" Y="19"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -149,7 +150,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="19" Y="32"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bgraspriteanimation.pas"/>
@@ -157,7 +158,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="9"/>
         <CursorPos X="97" Y="24"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -165,136 +166,146 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1460"/>
         <CursorPos Y="1480"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="../../level_editor/Editor/ufilehelper.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="111"/>
         <CursorPos X="17" Y="119"/>
+        <UsageCount Value="8"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/customform.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1686"/>
+        <CursorPos Y="1683"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/customnotebook.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="323"/>
+        <CursorPos Y="338"/>
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="renderer.pas"/>
-        <Caret Line="144" Column="9" TopLine="114"/>
-      </Position>
-      <Position>
-        <Filename Value="renderer.pas"/>
-        <Caret Line="145" Column="9" TopLine="117"/>
-      </Position>
-      <Position>
-        <Filename Value="renderer.pas"/>
-        <Caret Line="146" TopLine="129"/>
-      </Position>
+    <JumpHistory HistoryIndex="28">
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="182" Column="20" TopLine="169"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="184" Column="20" TopLine="184"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="401" Column="32" TopLine="401"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="402" Column="32" TopLine="402"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="401" Column="32" TopLine="401"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="401" Column="32" TopLine="401"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="402" Column="32" TopLine="402"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="401" Column="32" TopLine="401"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="402" Column="32" TopLine="402"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="401" Column="32" TopLine="401"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="429" Column="37" TopLine="404"/>
+        <Caret Line="440" Column="17" TopLine="437"/>
       </Position>
       <Position>
         <Filename Value="level.pas"/>
-        <Caret Line="25" Column="8" TopLine="4"/>
-      </Position>
-      <Position>
-        <Filename Value="editor.lpr"/>
-        <Caret Line="28"/>
-      </Position>
-      <Position>
-        <Filename Value="filehelper.pas"/>
-        <Caret Line="96" Column="58" TopLine="80"/>
-      </Position>
-      <Position>
-        <Filename Value="filehelper.pas"/>
-        <Caret Line="97" Column="53" TopLine="79"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="362" TopLine="344"/>
-      </Position>
-      <Position>
-        <Filename Value="renderer.pas"/>
-        <Caret Line="154" Column="20" TopLine="131"/>
+        <Caret Line="162" Column="12" TopLine="150"/>
       </Position>
       <Position>
         <Filename Value="level.pas"/>
-        <Caret Line="62" Column="31" TopLine="43"/>
+        <Caret Line="149" Column="38" TopLine="145"/>
       </Position>
       <Position>
-        <Filename Value="filehelper.pas"/>
-        <Caret Line="228" Column="43" TopLine="209"/>
+        <Filename Value="level.pas"/>
+        <Caret Line="160" TopLine="144"/>
       </Position>
       <Position>
-        <Filename Value="renderer.pas"/>
-        <Caret Line="154" Column="28" TopLine="143"/>
-      </Position>
-      <Position>
-        <Filename Value="main.pas"/>
-        <Caret Line="363" TopLine="149"/>
+        <Filename Value="level.pas"/>
+        <Caret Line="169" TopLine="145"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="8" Column="78"/>
+        <Caret Line="441" TopLine="427"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="160" TopLine="145"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="169" TopLine="145"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="438" Column="3" TopLine="436"/>
+        <Caret Line="441" TopLine="427"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="442" Column="124" TopLine="166"/>
+        <Caret Line="243" Column="47" TopLine="235"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="161" Column="19" TopLine="147"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="164" Column="35" TopLine="147"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="389" Column="5" TopLine="366"/>
+        <Caret Line="243" Column="76" TopLine="235"/>
       </Position>
       <Position>
-        <Filename Value="renderer.pas"/>
-        <Caret Line="8" Column="44"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="244" Column="13" TopLine="230"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="158" Column="42" TopLine="147"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="156" Column="6" TopLine="142"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="160" Column="14" TopLine="146"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="447" Column="5" TopLine="440"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="445" Column="17" TopLine="431"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="160" Column="5" TopLine="140"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="445" Column="25" TopLine="431"/>
+      </Position>
+      <Position>
+        <Filename Value="level.pas"/>
+        <Caret Line="60" Column="14" TopLine="48"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="445" Column="20" TopLine="430"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="444" Column="36" TopLine="431"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="309" Column="14" TopLine="286"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="293" Column="6" TopLine="286"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="236" Column="135" TopLine="225"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="311" Column="14" TopLine="235"/>
       </Position>
       <Position>
         <Filename Value="editor.lpr"/>
-        <Caret Line="22"/>
+        <Caret Line="20" Column="41"/>
       </Position>
     </JumpHistory>
     <RunParams>

@@ -22,6 +22,8 @@ type
     ListBoxObject: TListBox;
     MemoProps: TMemo;
     MainPageControl: TPageControl;
+    MenuItem3: TMenuItem;
+    menuUndo: TMenuItem;
     RadioEditing: TRadioGroup;
     SaveDialog: TSaveDialog;
     ScrollBox1: TScrollBox;
@@ -59,6 +61,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
+    procedure menuUndoClick(Sender: TObject);
     procedure MenuItemSaveAsClick(Sender: TObject);
     procedure MenuItemSaveClick(Sender: TObject);
     procedure MenuItemOpenClick(Sender: TObject);
@@ -237,7 +240,9 @@ begin
 
           if (EdMode = 'tile') then
           begin
+            Level.SaveCommand(layerId,Level.Layer[LayerId].Data[posY][posX], posX,posY);
             Level.Layer[LayerId].Data[posY][posX] := tileID;
+
           end
           else
           begin
@@ -299,9 +304,13 @@ begin
      begin
         posX := (x - offsetX) div (Level.tileSize * Scale);
         posY := (y - offsetY) div (Level.tileSize * Scale);
-        if (EdMode = 'tile') then
+        if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
         begin
-           Level.Layer[LayerId].Data[posY][posX] := tileID;
+          if (EdMode = 'tile') then
+          begin
+             Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
+             Level.Layer[LayerId].Data[posY][posX] := tileID;
+          end
         end
      end;
 
@@ -430,6 +439,16 @@ begin
   begin
     Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
   end;
+end;
+
+procedure TFormMain.menuUndoClick(Sender: TObject);
+var
+   oldAction :TAction;
+begin
+   if (Level.Undo(oldAction)) then;
+   begin
+    Level.Layer[oldAction.layer].Data[oldAction.r][oldAction.c] := oldAction.tile;
+   end;
 end;
 
 procedure TFormMain.MenuItemSaveAsClick(Sender: TObject);
