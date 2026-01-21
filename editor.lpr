@@ -9,13 +9,8 @@ uses
   athreads,
    {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms,
-  lazopenglcontext,
-  main,
-  loader,
-  texture,
-  level,
-  layer, vector2, FileHelper, gameobject { you can add units after this };
+  Forms, lazopenglcontext, main, loader, texture, level, layer, vector2,
+  FileHelper, gameobject, stack { you can add units after this };
 
 {$R *.res}
 

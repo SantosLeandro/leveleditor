@@ -15,7 +15,7 @@ uses
   loader,
   texture,
   level,
-  layer, vector2 { you can add units after this };
+  layer, vector2, FileHelper, gameobject { you can add units after this };
 
 {$R *.res}
 

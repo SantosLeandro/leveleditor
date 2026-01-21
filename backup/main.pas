@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, OpenGLContext,
-  GL, glu,glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, GameObject, Vector2,FileHelper,
+  GL, glu,glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, GameObject, Vector2,FileHelper, Stack,
   ComCtrls, BCListBox, BGRASpriteAnimation, BGRABitmap, BCTypes, Types;
 
 type
@@ -240,8 +240,12 @@ begin
 
           if (EdMode = 'tile') then
           begin
-            Level.SaveCommand(layerId,Level.Layer[LayerId].Data[posY][posX], posX,posY);
-            Level.Layer[LayerId].Data[posY][posX] := tileID;
+             if Level.Layer[LayerId].Data[posY][posX] <> tileId then
+             begin
+                  Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
+                  Level.InsertTile(layerId,posX,posY,tileID);
+             end
+            //Level.Layer[LayerId].Data[posY][posX] := tileID;
 
           end
           else
@@ -308,8 +312,13 @@ begin
         begin
           if (EdMode = 'tile') then
           begin
-             Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
-             Level.Layer[LayerId].Data[posY][posX] := tileID;
+             if Level.Layer[LayerId].Data[posY][posX] <> tileId then
+             begin
+                  Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
+                  Level.InsertTile(layerId,posX,posY,tileID);
+             end
+
+             //Level.Layer[LayerId].Data[posY][posX] := tileID;
           end
         end
      end;
@@ -443,11 +452,12 @@ end;
 
 procedure TFormMain.menuUndoClick(Sender: TObject);
 var
-   oldAction :TAction;
+   oldCommand :TCommand;
 begin
-   if (Level.Undo(oldAction)) then;
+   if (Level.Undo(oldCommand)) then
    begin
-    Level.Layer[oldAction.layer].Data[oldAction.r][oldAction.c] := oldAction.tile;
+     Level.InsertTile(oldCommand.layer,oldCommand.w,oldCommand.h,oldCommand.tile);
+     GLBox.Invalidate;
    end;
 end;
 

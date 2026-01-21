@@ -5,7 +5,7 @@ unit level;
 interface
 
 uses
-  Classes, SysUtils, fpjson, jsonparser, jsonConf, layer, Dialogs, fgl, texture;
+  Classes, SysUtils, fpjson, jsonparser, jsonConf, layer, Dialogs, fgl, texture, stack;
 
 type
   TAction = record
@@ -30,6 +30,7 @@ type
     FProps: string;
     FActions: array of TAction;
     FActionCount: integer;
+    FStack: TStack;
     procedure SetData(Index: integer; l: TLayer);
     function GetData(Index: integer): TLayer;
 
@@ -57,7 +58,7 @@ type
     property Scale: integer read  FScale write FScale;
     property Props: string read  FProps write FProps;
     function Load(filename: string): TLevel;
-    function TLevel.Undo(out A: TAction): Boolean;
+    function Undo(out A: TCommand): Boolean;
     procedure SaveCommand(l: integer; tile: integer; w: integer; h: integer);
   end;
 
@@ -71,6 +72,7 @@ begin
   FActionCount := 0;
   FScale := 1;
   FProps := '{"bgm":"song.wav"}';
+  FStack := TStack.Create();
 end;
 
 function TLevel.GetTileScale: integer;
@@ -138,25 +140,33 @@ end;
 
 procedure TLevel.InsertTile(index: integer; w: integer; h: integer; tile: integer);
 begin
-  FLayers[index][h][w] := tile;
+  //FStack.Push(TCommand.Create(index,GetData(index).Data[h][w],w,h));
+  GetData(index).Data[h][w] := tile;
+
 end;
 
 procedure TLevel.SaveCommand(l: integer; tile: integer; w: integer; h: integer);
+var
+  oldTile: integer;
 begin
-  FActions[FActionCount].layer := l;
-  FActions[FActionCount].tile  := tile;
-  FActions[FActionCount].r     := h;
-  FActions[FActionCount].c     := w;
-  FActionCount := FActionCount + 1;
+  oldTile := GetData(l).Data[h][w];
+  if oldTile <> tile then
+  begin
+   FStack.Push(TCommand.Create(l,tile,w,h));
+  end;
 end;
 
-function TLevel.Undo(out A: TAction): Boolean;
+function TLevel.Undo(out A: TCommand): Boolean;
 begin
-  Result := FActionCount > 0;
-  if not Result then Exit;
+  if FStack.IsEmpty then
+  begin
+    A := nil;
+    Exit(False);
+  end;
 
-  Dec(FActionCount);
-  A := FActions[FActionCount];
+  A := FStack.Pop;
+  Result := True;
+
 end;
 
 function TLevel.Load(filename: string): TLevel;
