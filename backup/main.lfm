@@ -59,8 +59,8 @@ object FormMain: TFormMain
           Height = 400
           Top = 2
           Width = 272
-          HorzScrollBar.Page = 96
-          VertScrollBar.Page = 72
+          HorzScrollBar.Page = 216
+          VertScrollBar.Page = 136
           Align = alClient
           BorderSpacing.Around = 2
           ClientHeight = 398
@@ -68,9 +68,9 @@ object FormMain: TFormMain
           TabOrder = 0
           object Tileset: TBGRASpriteAnimation
             Left = 0
-            Height = 73
+            Height = 137
             Top = -1
-            Width = 96
+            Width = 216
             AnimInvert = False
             AnimPosition = 1
             AnimRepeat = 0

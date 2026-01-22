@@ -97,6 +97,7 @@ type
     MouseRightBtn: boolean;
     Scale: integer;
     TileId: integer;
+    Zoom: integer;
     GameObjects: TArrayGameObject;
     EdMode: string;
     function getTestMap: TIntegerArray;
@@ -191,6 +192,7 @@ begin
   InitLevel;
   EdMode := 'tile';
   MouseRightBtn:=false;
+  Zoom := 2;
 
 end;
 
@@ -411,7 +413,7 @@ begin
   if( level <> nil ) then
   begin
     Renderer.DrawBackground(level.width,level.height,Level.TileSize);
-    Renderer.DrawGrid(level.width,level.height,Level.TileSize);
+    //Renderer.DrawGrid(level.width,level.height,Level.TileSize);
     for i := 0 to Level.LayerCount do
     begin
       Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
@@ -426,6 +428,8 @@ begin
       end;
     end;
    end;
+
+  Renderer.DrawGrid(level.width,level.height,Level.TileSize);
 
   // Draw Mouse Cursor
    glBindTexture(GL_TEXTURE_2D, 0);
@@ -457,6 +461,7 @@ begin
    if (Level.Undo(oldCommand)) then
    begin
      Level.InsertTile(oldCommand.layer,oldCommand.w,oldCommand.h,oldCommand.tile);
+     oldCommand.Free;
      GLBox.Invalidate;
    end;
 end;
@@ -534,30 +539,57 @@ procedure TFormMain.TilesetMouseDown(Sender: TObject; Button: TMouseButton;
 var
   row, col: integer;
 begin
-  col := x div Level.Tilesize;
-  row := y div Level.Tilesize;
+  //col := x div Level.Tilesize;
+  //row := y div Level.Tilesize;
+   col := TilesetCursor.x div (Level.Tilesize * zoom);
+   row := TilesetCursor.y div (Level.Tilesize * zoom);
+   MainStatusBar.SimpleText := 'COL: ' + IntToStr(Col);
   tileId := col + (row * ( Level.Layer[LayerId].Texture.Width div Level.Tilesize));
 end;
 
 procedure TFormMain.TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
-  TilesetCursor.x := x div Level.Tilesize * Level.Tilesize;
-  TilesetCursor.y := y div Level.Tilesize * Level.Tilesize;
+  TilesetCursor.x := (x div (Level.Tilesize * zoom) * (Level.Tilesize * zoom));
+  TilesetCursor.y := (y div (Level.Tilesize * zoom) * (Level.Tilesize * zoom));
   Tileset.Invalidate;
+
 end;
 
 procedure TFormMain.TilesetRedrawAfter(Sender: TObject; Bitmap: TBGRABitmap);
 var
-   rect : TRect;
+   rect,dstRect : TRect;
+   mx, my: integer;
 begin
-  rect.Top:= TilesetCursor.y;
-  rect.Bottom:= TilesetCursor.y + Level.tilesize;
-  rect.Left:= TilesetCursor.x;
-  rect.Right := TilesetCursor.x + Level.tilesize;
+  //mX := ((TilesetCursor.x) div (Level.Tilesize * zoom)) * (tileSize * zoom);
+  //mY := ((TilesetCursor.y) div (Level.Tilesize * zoom)) * (tileSize * zoom);
+  mx :=  TilesetCursor.x;
+  my :=  TilesetCursor.y;
+  rect.Top:= my;
+  rect.Bottom:= my + (Level.tilesize * zoom);
+  rect.Left:= mx;
+  rect.Right := mx + (Level.tilesize * zoom);
+
+
   if  Level.Layer[LayerId].Texture.Bitmap <> nil then
   begin
-     Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+     dstRect.Top := 0;
+     dstRect.Left := 0;
+     dstRect.Bottom:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+     dstRect.Right := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+     Tileset.sprite.Clear;
+
+     Tileset.Sprite.SetSize(1000,1000);
+     //Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+
+     //Tileset.Width:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+     //Tileset.Height:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+     //Tileset.Sprite.Width := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width;
+     //Tileset.Sprite.Height := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height;
+
+     Tileset.Sprite.Canvas.StretchDraw(dstRect, Level.Layer[LayerId].Texture.Bitmap.Bitmap);
+
+
      Tileset.Sprite.Canvas.DrawFocusRect(rect);
   end;
 end;
