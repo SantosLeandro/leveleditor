@@ -46,6 +46,7 @@ type
     LeftPanel: TPanel;
     OpenDialog: TOpenDialog;
     MainStatusBar: TStatusBar;
+    TrackBar1: TTrackBar;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure GLBoxClick(Sender: TObject);
@@ -77,6 +78,7 @@ type
     procedure TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure TilesetPaint(Sender: TObject);
+    procedure TrackBar1Change(Sender: TObject);
   private
 
   public
@@ -193,7 +195,7 @@ begin
   InitLevel;
   EdMode := 'tile';
   MouseRightBtn:=false;
-  Zoom := 2;
+  Zoom := 1;
 
 end;
 
@@ -625,13 +627,20 @@ begin
      dstRect.Left := 0;
      dstRect.Bottom:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
      dstRect.Right := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
-
-
+     Tileset.Width := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+     Tileset.Height := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+     Tileset.Bitmap.Fill(BGRAPixelTransparent);
      Tileset.Bitmap.StretchPutImage(dstRect,Level.Layer[LayerId].Texture.Bitmap,TDrawMode.dmLinearBlend);
 
     Tileset.Bitmap.Canvas.AntialiasingMode := amOff;
     Tileset.Bitmap.Canvas.DrawFocusRect(rect);
   end;
+end;
+
+procedure TFormMain.TrackBar1Change(Sender: TObject);
+begin
+  zoom := TrackBAr1.Position;
+  Tileset.Invalidate;
 end;
 
 end.
