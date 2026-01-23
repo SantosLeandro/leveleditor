@@ -59,42 +59,25 @@ object FormMain: TFormMain
           Height = 400
           Top = 2
           Width = 272
-          HorzScrollBar.Page = 216
-          VertScrollBar.Page = 136
+          HorzScrollBar.Page = 200
+          VertScrollBar.Page = 192
           Align = alClient
           BorderSpacing.Around = 2
           ClientHeight = 398
           ClientWidth = 270
           TabOrder = 0
-          object Tileset: TBGRASpriteAnimation
+          object Tileset: TBGRAGraphicControl
             Left = 0
-            Height = 137
-            Top = -1
-            Width = 216
-            AnimInvert = False
-            AnimPosition = 1
-            AnimRepeat = 0
-            AnimRepeatLap = 0
-            AnimSpeed = 1000
-            AnimStatic = True
-            Center = True
-            Proportional = True
-            SpriteCount = 1
-            SpriteFillOpacity = 255
-            SpriteFlipMode = flNone
-            SpriteKeyColor = clNone
-            SpriteResampleFilter = rfLinear
-            SpriteResampleMode = rmSimpleStretch
-            SpriteRotation = rtNone
-            Stretch = True
-            Tile = False
-            AutoSize = True
-            Caption = 'Tileset'
+            Height = 192
+            Top = 0
+            Width = 200
+            Color = clWhite
+            ColorOpacity = 128
+            Alignment = taCenter
             OnClick = TilesetClick
             OnMouseDown = TilesetMouseDown
             OnMouseMove = TilesetMouseMove
-            OnRedrawAfter = TilesetRedrawAfter
-            OnRedrawBefore = TilesetRedrawBefore
+            OnPaint = TilesetPaint
           end
         end
       end

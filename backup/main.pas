@@ -6,14 +6,16 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, OpenGLContext,
-  GL, glu,glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, GameObject, Vector2,FileHelper, Stack,
-  ComCtrls, BCListBox, BGRASpriteAnimation, BGRABitmap, BCTypes, Types;
+  GL, glu, glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer,
+  GameObject, Vector2, FileHelper, Stack, ComCtrls, BCListBox,
+  BGRASpriteAnimation, BGRABitmap, BCTypes, BGRAGraphicControl,BGRATransform,BGRABitmapTypes, Types;
 
 type
   EditingMode = (ED_TILEMAP, ED_GAMEOBJECT);
   { TFormMain }
 
   TFormMain = class(TForm)
+
     BtnApply: TButton;
     EdtLvlWidth: TLabeledEdit;
     EdtLvlHeight: TLabeledEdit;
@@ -30,7 +32,7 @@ type
     TabTileset: TTabSheet;
     TabGameObject: TTabSheet;
     TabLevel: TTabSheet;
-    Tileset: TBGRASpriteAnimation;
+    Tileset: TBGRAGraphicControl;
     GLBox: TOpenGLControl;
     Label1: TLabel;
     ListBoxLayers: TListBox;
@@ -74,8 +76,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure TilesetRedrawAfter(Sender: TObject; Bitmap: TBGRABitmap);
-    procedure TilesetRedrawBefore(Sender: TObject; Bitmap: TBGRABitmap);
+    procedure TilesetPaint(Sender: TObject);
   private
 
   public
@@ -413,7 +414,7 @@ begin
   if( level <> nil ) then
   begin
     Renderer.DrawBackground(level.width,level.height,Level.TileSize);
-    //Renderer.DrawGrid(level.width,level.height,Level.TileSize);
+    Renderer.DrawGrid(level.width,level.height,Level.TileSize);
     for i := 0 to Level.LayerCount do
     begin
       Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
@@ -428,8 +429,6 @@ begin
       end;
     end;
    end;
-
-  Renderer.DrawGrid(level.width,level.height,Level.TileSize);
 
   // Draw Mouse Cursor
    glBindTexture(GL_TEXTURE_2D, 0);
@@ -450,7 +449,8 @@ begin
   LayerId := ListBoxLayers.ItemIndex;
   if Level.Layer[LayerId].Texture.Bitmap <> nil then
   begin
-    Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+    //Tileset.Bitmap.Bitmap := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+   //Tileset2t.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
   end;
 end;
 
@@ -529,10 +529,6 @@ begin
 
 end;
 
-procedure TFormMain.TilesetClick(Sender: TObject);
-begin
-
-end;
 
 procedure TFormMain.TilesetMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
@@ -544,7 +540,7 @@ begin
    col := TilesetCursor.x div (Level.Tilesize * zoom);
    row := TilesetCursor.y div (Level.Tilesize * zoom);
    MainStatusBar.SimpleText := 'COL: ' + IntToStr(Col);
-  tileId := col + (row * ( Level.Layer[LayerId].Texture.Width div Level.Tilesize));
+   tileId := col + (row * ( Level.Layer[LayerId].Texture.Width div Level.Tilesize));
 end;
 
 procedure TFormMain.TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -556,7 +552,59 @@ begin
 
 end;
 
-procedure TFormMain.TilesetRedrawAfter(Sender: TObject; Bitmap: TBGRABitmap);
+//procedure TFormMain.Tileset2RedrawAfter(Sender: TObject; Bitmap: TBGRABitmap);
+//var
+//   rect,dstRect : TRect;
+//   mx, my: integer;
+//begin
+//  //mX := ((TilesetCursor.x) div (Level.Tilesize * zoom)) * (tileSize * zoom);
+//  //mY := ((TilesetCursor.y) div (Level.Tilesize * zoom)) * (tileSize * zoom);
+//  mx :=  TilesetCursor.x;
+//  my :=  TilesetCursor.y;
+//  rect.Top:= my;
+//  rect.Bottom:= my + (Level.tilesize * zoom);
+//  rect.Left:= mx;
+//  rect.Right := mx + (Level.tilesize * zoom);
+//
+//
+//  if  Level.Layer[LayerId].Texture.Bitmap <> nil then
+//  begin
+//     dstRect.Top := 0;
+//     dstRect.Left := 0;
+//     dstRect.Bottom:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+//     dstRect.Right := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+//     //Tileset2t.sprite.Clear;
+//
+//    //Tileset2t.Sprite.SetSize(1000,1000);
+//     //Tileset2t.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
+//
+//     //Tileset2t.Width:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+//     //Tileset2t.Height:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+//     //Tileset2t.Sprite.Width := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width;
+//     //Tileset2t.Sprite.Height := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height;
+//
+//    //Tileset2t.Sprite.Canvas.StretchDraw(dstRect, Level.Layer[LayerId].Texture.Bitmap.Bitmap);
+//
+//
+//    Tileset.Bitmap.Canvas.DrawFocusRect(rect);
+//  end;
+//end;
+//
+//procedure TFormMain.Tileset2RedrawBefore(Sender: TObject; Bitmap: TBGRABitmap);
+//begin
+//
+//end;
+
+procedure TFormMain.TilesetClick(Sender: TObject);
+begin
+
+end;
+
+
+
+
+
+procedure TFormMain.TilesetPaint(Sender: TObject);
 var
    rect,dstRect : TRect;
    mx, my: integer;
@@ -577,26 +625,13 @@ begin
      dstRect.Left := 0;
      dstRect.Bottom:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
      dstRect.Right := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
-     Tileset.sprite.Clear;
-
-     Tileset.Sprite.SetSize(1000,1000);
-     //Tileset.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
-
-     //Tileset.Width:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
-     //Tileset.Height:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
-     //Tileset.Sprite.Width := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width;
-     //Tileset.Sprite.Height := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height;
-
-     Tileset.Sprite.Canvas.StretchDraw(dstRect, Level.Layer[LayerId].Texture.Bitmap.Bitmap);
 
 
-     Tileset.Sprite.Canvas.DrawFocusRect(rect);
+     Tileset.Bitmap.StretchPutImage(dstRect,Level.Layer[LayerId].Texture.Bitmap,TDrawMode.dmLinearBlend);
+
+    Tileset.Bitmap.Canvas.AntialiasingMode := amOff;
+    Tileset.Bitmap.Canvas.DrawFocusRect(rect);
   end;
-end;
-
-procedure TFormMain.TilesetRedrawBefore(Sender: TObject; Bitmap: TBGRABitmap);
-begin
-
 end;
 
 end.
