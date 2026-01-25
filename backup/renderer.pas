@@ -8,10 +8,16 @@ uses
   Classes, SysUtils, OpenGLContext, GL, glu, BGRABitmap, Texture, Dialogs, gameobject;
 
 type
+
+  TRenderColor = record
+    r, g, b, a: real;
+  end;
+
   TIntegerArray = array of array of integer;
 
   TRenderer = class
     FScale: integer;
+    FColor: TRenderColor;
     constructor Create;
     procedure Mode2D;
     procedure ClearScreen;
@@ -25,12 +31,17 @@ type
     function LoadGLTexture(const FileName: string): GLuint;
     procedure glWrite(X, Y: GLfloat; Font: Pointer; Text: String);
     property Scale: integer read FScale write FScale;
+    property RenderColor: TRenderColor read FColor write FColor;
   end;
 
 implementation
 constructor TRenderer.Create;
 begin
   FScale := 1;
+  FColor.r := 1;
+  FColor.g := 1;
+  FColor.b := 1;
+  FColor.a := 1;
 end;
 
 function TRenderer.glGetViewportWidth: integer;
@@ -116,7 +127,7 @@ begin
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glColor3f(1, 1, 1);
+  glColor4f(FColor.r, FColor.g, FColor.b, FColor.a);
   glBegin(GL_QUADS);
   for h := Low(arr) to High(arr) do
   begin
@@ -151,7 +162,7 @@ begin
 
   end;
   glEnable(GL_LINE_STIPPLE);
-  glLineStipple(3,43690);
+  glLineStipple(2,43690);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glColor3f(1, 1, 1);
   glLineWidth(2);
@@ -169,9 +180,6 @@ var
   w, h, tile: integer;
 begin
   glBindTexture(GL_TEXTURE_2D, 0);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glEnable(GL_LINE_STIPPLE);
-  glLineStipple(3,43690);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glColor3f(0.5, 0.5, 0.5);
   glBegin(GL_QUADS);
@@ -265,7 +273,7 @@ begin
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glColor3f(1, 1, 1);
+  glColor4f(FColor.r, FColor.g, FColor.b, FColor.a);
   glBegin(GL_QUADS);
       srcY := sprite.y  / texture.Height;
       srcX := sprite.x / texture.Width;

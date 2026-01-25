@@ -90,6 +90,7 @@ type
     Tilemap : TIntegerArray;
     LayerId: integer;
     MouseX, MouseY: integer;
+    ObjMouseX, ObjMouseY: integer;
     OldMouseX, OldMouseY: integer;
     OffsetX, OffsetY: integer;
     Offset: TPoint2D;
@@ -103,6 +104,7 @@ type
     Zoom: integer;
     GameObjects: TArrayGameObject;
     EdMode: string;
+    GameObjectId:integer;
     function getTestMap: TIntegerArray;
     procedure InitLevel;
 
@@ -256,8 +258,8 @@ begin
           else
           begin
             goName := ListBoxObject.GetSelectedText;
-            objX := posX * (Level.tileSize);
-            objY := posY * (Level.tileSize);
+            objX := (x - offsetX) div ( Scale);
+            objY := (y - offsetY) div ( Scale);
             Level.Layer[LayerId].AddGameObject(objX,objY,
             LevelFile.GetSprite(goName).w,
             LevelFile.GetSprite(goName).h,
@@ -278,6 +280,7 @@ begin
             //objY :=  posY * level.tilesize;
             objx := (x - offsetx) div scale;
             objy := (y - offsety) div scale;
+            MainStatusBar.SimpleText:= 'OBJX '+IntToStr(objX)+' OBJY '+IntToStr(objY);
             Level.Layer[LayerId].RemoveGameObject(objX,objY);
           end;
        end;
@@ -303,6 +306,7 @@ begin
      DeltaY := Y - OldMouseY;
      OldMouseX := X;
      OldMouseY := Y;
+
      if MouseMiddleBtn then
      begin
       OffsetX := OffsetX + DeltaX;
@@ -334,6 +338,7 @@ begin
         posY := (y - offsetY) div (Level.tileSize * Scale);
         if (EdMode = 'tile') then
         begin
+           if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
            Level.Layer[LayerId].Data[posY][posX] := -1;
         end
      end;
@@ -394,6 +399,10 @@ var
    j: integer;
    go: TSprite;
 begin
+  Renderer.ColorR := 1.0;
+  Renderer.ColorG := 1.0;
+  Renderer.ColorB := 1.0;
+  Renderer.ColorA := 1.0;
   go.x := 16;
   go.y := 16;
   go.w := 16;
@@ -419,6 +428,9 @@ begin
     Renderer.DrawGrid(level.width,level.height,Level.TileSize);
     for i := 0 to Level.LayerCount do
     begin
+      Renderer.ColorA  := 0.5;
+      if(i = layerId) then
+           Renderer.ColorA := 1.0;
       Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
       for j:=0 to High(Level.Layer[layerId].GameObject) do
       begin
@@ -432,6 +444,22 @@ begin
     end;
    end;
 
+
+  if(EdMode <> 'tile') then
+  begin
+     Renderer.ColorR := 0.0;
+     Renderer.ColorG := 1.0;
+     Renderer.ColorB := 0.0;
+     Renderer.ColorA := 0.3;
+     Renderer.DrawGameObject(
+           (oldMouseX - OffsetX) div scale,
+           (oldMouseY - OffsetY) div scale,
+           LevelFile.GetSprite(ListBoxObject.GetSelectedText),
+           Texture);
+
+  end
+  else
+  begin
   // Draw Mouse Cursor
    glBindTexture(GL_TEXTURE_2D, 0);
    glColor4f(1,1,0,0.2);
@@ -441,6 +469,7 @@ begin
      glVertex3f(mouseX+Level.Tilesize * Scale, mouseY+Level.Tilesize * Scale,0);
      glVertex3f(mouseX, mouseY+Level.Tilesize * Scale,0);
    glEnd();
+  end;
 
   // present renderer
   GLbox.SwapBuffers;

@@ -28,6 +28,7 @@ type
       h: integer; Name: string);
     procedure SetData(s: string);
     procedure RemoveGameObject(x: integer; y:integer);
+    procedure RemoveGameObject(index:integer);
     procedure AddGameObject(x: integer; y:integer; name:string);
     procedure AddGameObject(x: integer; y:integer;w:integer;h:integer; name:string);
     property Name: string read FName write FName;
@@ -35,6 +36,7 @@ type
     property Texture: TTexture read FTexture write FTexture;
     property GameObject: TArrayGameObject read FGameObject write FGameObject;
     function GetDataToString(): string;
+    function GetGameObject(x: integer; y: integer): integer;
 
   end;
 
@@ -78,7 +80,7 @@ begin
   FData := arr;
   FWidth := High(arr[0]);
   FHeight := High(arr);
-  SetLength(FGameObject, 1000);
+  SetLength(FGameObject, 100);
   GameObjectIndex := 0;
 end;
 
@@ -97,7 +99,7 @@ begin
   setData(strData);
   FWidth := w;
   FHeight := h;
-  SetLength(FGameObject, 1000);
+  SetLength(FGameObject, 100);
   GameObjectIndex := 0;
 end;
 
@@ -145,6 +147,35 @@ begin
   end;
   //showMessage(dataStr);
   result := dataStr;
+end;
+
+function TLayer.GetGameObject(x: integer; y: integer): integer;
+var
+  i: integer;
+begin
+  for i:= 0 to High(FGameObject) do
+  begin
+      if(FGameObject[i]<>nil) then
+      begin
+        if((x > FGameObject[i].x) and (x < FGameObject[i].x + FGameObject[i].w) and
+         (y > FGameObject[i].y) and (y < FGameObject[i].y + FGameObject[i].h)) then
+         begin
+           result := i;
+         end;
+      end;
+  end;
+end;
+
+procedure TLayer.RemoveGameObject(index: integer);
+var
+  Go: TGameObject;
+begin
+     Go := GameObject[GameObjectIndex - 1];
+     GameObject[index].Free;
+     GameObject[index] := Go;
+     GameObject[GameObjectIndex - 1] := nil;
+     GameObjectIndex := GameObjectIndex - 1;
+  end;
 end;
 
 end.

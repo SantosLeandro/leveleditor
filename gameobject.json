@@ -5,15 +5,15 @@
             "name":"player",
             "x":"0",
             "y":"0",
-            "width":"16",
-            "height":"32"
+            "width":"15",
+            "height":"43"
         },
         {
             "name":"enemy1",
             "x":"16",
             "y":"0",
-            "width":"16",
-            "height":"16"
+            "width":"25",
+            "height":"20"
         },
         {
             "name":"enemy2",
