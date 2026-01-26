@@ -3,15 +3,15 @@
     "gameobjects":[
         {
             "name":"player",
-            "x":"0",
-            "y":"0",
-            "width":"15",
+            "x":"30",
+            "y":"26",
+            "width":"24",
             "height":"43"
         },
         {
             "name":"enemy1",
-            "x":"16",
-            "y":"0",
+            "x":"6",
+            "y":"313",
             "width":"25",
             "height":"20"
         },

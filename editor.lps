@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
         <CursorPos X="41" Y="15"/>
-        <UsageCount Value="186"/>
+        <UsageCount Value="189"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -19,9 +19,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="454"/>
+        <TopLine Value="486"/>
         <CursorPos X="12" Y="472"/>
-        <UsageCount Value="186"/>
+        <UsageCount Value="189"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -30,7 +30,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="8"/>
         <CursorPos X="21" Y="9"/>
-        <UsageCount Value="186"/>
+        <UsageCount Value="189"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -39,7 +39,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="257"/>
         <CursorPos Y="143"/>
-        <UsageCount Value="186"/>
+        <UsageCount Value="189"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -49,7 +49,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="52"/>
         <CursorPos X="20" Y="58"/>
-        <UsageCount Value="181"/>
+        <UsageCount Value="184"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -57,7 +57,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
         <CursorPos Y="159"/>
-        <UsageCount Value="175"/>
+        <UsageCount Value="178"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -66,7 +66,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="32"/>
         <CursorPos X="45" Y="177"/>
-        <UsageCount Value="167"/>
+        <UsageCount Value="170"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -75,7 +75,7 @@
         <UnitName Value="Vector2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="21" Y="11"/>
-        <UsageCount Value="136"/>
+        <UsageCount Value="139"/>
       </Unit>
       <Unit>
         <Filename Value="filehelper.pas"/>
@@ -84,7 +84,7 @@
         <EditorIndex Value="9"/>
         <TopLine Value="14"/>
         <CursorPos Y="29"/>
-        <UsageCount Value="124"/>
+        <UsageCount Value="127"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -93,7 +93,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="3"/>
         <CursorPos X="13" Y="41"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="109"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -102,7 +102,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="46"/>
         <CursorPos X="8" Y="69"/>
-        <UsageCount Value="47"/>
+        <UsageCount Value="50"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -111,13 +111,13 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos X="11" Y="74"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="0"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgragraphics.pas"/>
         <UnitName Value="BGRAGraphics"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgradefaultbitmap.pas"/>
@@ -125,7 +125,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="18"/>
         <CursorPos X="30" Y="33"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgrabitmaptypes.pas"/>
@@ -133,7 +133,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
         <CursorPos X="28" Y="25"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bcbasectrls.pas"/>
@@ -141,7 +141,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="84" Y="20"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -150,7 +150,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="40" Y="19"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -158,7 +158,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="19" Y="32"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="../../../.lazarus/onlinepackagemanager/packages/BGRAControls/bgraspriteanimation.pas"/>
@@ -166,7 +166,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="9"/>
         <CursorPos X="97" Y="24"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -174,28 +174,28 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1460"/>
         <CursorPos Y="1480"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit>
       <Unit>
         <Filename Value="../../level_editor/Editor/ufilehelper.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="111"/>
         <CursorPos X="17" Y="119"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="/usr/lib64/lazarus/lcl/include/customform.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1686"/>
         <CursorPos Y="1683"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit>
       <Unit>
         <Filename Value="/usr/lib64/lazarus/lcl/include/customnotebook.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="323"/>
         <CursorPos Y="338"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit>
       <Unit>
         <Filename Value="../../.lazarus/onlinepackagemanager/packages/BGRABitmap/bgrabitmap/bgralclbitmap.pas"/>
@@ -203,7 +203,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="470"/>
         <CursorPos Y="484"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
