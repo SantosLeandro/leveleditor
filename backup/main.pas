@@ -17,6 +17,7 @@ type
   TFormMain = class(TForm)
 
     BtnApply: TButton;
+    edtObjectTag: TEdit;
     EdtLvlWidth: TLabeledEdit;
     EdtLvlHeight: TLabeledEdit;
     EdtLvlName: TLabeledEdit;
@@ -105,6 +106,7 @@ type
     GameObjects: TArrayGameObject;
     EdMode: string;
     GameObjectId:integer;
+    GameObjectSelectedId: integer;
     function getTestMap: TIntegerArray;
     procedure InitLevel;
 
@@ -198,6 +200,7 @@ begin
   EdMode := 'tile';
   MouseRightBtn:=false;
   Zoom := 1;
+  GameObjectSelectedId:= -1;
 
 end;
 
@@ -215,7 +218,15 @@ end;
 procedure TFormMain.GLBoxKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-
+  if(key = 46) then
+  begin
+    if(GameObjectSelectedId > -1) then
+    begin
+      Level.Layer[LayerId].RemoveGameObject(GameObjectSelectedId);
+      GameObjectSelectedId:= -1;
+        GLBox.Invalidate;
+    end;
+  end;
 end;
 
 procedure TFormMain.GLBoxKeyUp(Sender: TObject; var Key: Word;
@@ -235,6 +246,7 @@ var
    posX, posY: integer;
    objX, objY: integer;
    goName: string;
+   goId: integer;
 begin
    MouseLeftBtn := false;
    posX := (x - offsetX) div (Level.tileSize * Scale);
@@ -280,8 +292,10 @@ begin
             //objY :=  posY * level.tilesize;
             objx := (x - offsetx) div scale;
             objy := (y - offsety) div scale;
-            MainStatusBar.SimpleText:= 'OBJX '+IntToStr(objX)+' OBJY '+IntToStr(objY);
-            Level.Layer[LayerId].RemoveGameObject(objX,objY);
+            //MainStatusBar.SimpleText:= 'OBJX '+IntToStr(objX)+' OBJY '+IntToStr(objY);
+            GameObjectSelectedId := Level.Layer[LayerId].GetGameObject(objX,objY);
+            //Level.Layer[LayerId].RemoveGameObject(objX,objY);
+            //MainStatusBar.SimpleText:= 'GOID '+IntToStr(goId);
           end;
        end;
        GLBox.invalidate;
@@ -432,14 +446,25 @@ begin
       if(i = layerId) then
            Renderer.ColorA := 1.0;
       Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
-      for j:=0 to High(Level.Layer[layerId].GameObject) do
+
+      for j:=0 to High(Level.Layer[i].GameObject) do
       begin
          if (Level.Layer[i].GameObject[j] <> nil) then
-         Renderer.DrawGameObject(
-           Level.Layer[i].GameObject[j].x,
-           Level.Layer[i].GameObject[j].y,
-           LevelFile.GetSprite(Level.Layer[i].GameObject[j].Name),
-           Texture);
+         begin
+           if(j = GameObjectSelectedId ) then
+           begin
+                Renderer.ColorG := 0.0;
+                Renderer.ColorB := 0.0
+           end
+           else
+               Renderer.ColorB := 1.0;
+
+           Renderer.DrawGameObject(
+             Level.Layer[i].GameObject[j].x,
+             Level.Layer[i].GameObject[j].y,
+             LevelFile.GetSprite(Level.Layer[i].GameObject[j].Name),
+             Texture);
+         end;
       end;
     end;
    end;
@@ -457,8 +482,9 @@ begin
            LevelFile.GetSprite(ListBoxObject.GetSelectedText),
            Texture);
 
-  end;
-
+  end
+  else
+  begin
   // Draw Mouse Cursor
    glBindTexture(GL_TEXTURE_2D, 0);
    glColor4f(1,1,0,0.2);
@@ -468,6 +494,7 @@ begin
      glVertex3f(mouseX+Level.Tilesize * Scale, mouseY+Level.Tilesize * Scale,0);
      glVertex3f(mouseX, mouseY+Level.Tilesize * Scale,0);
    glEnd();
+  end;
 
   // present renderer
   GLbox.SwapBuffers;

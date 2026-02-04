@@ -108,6 +108,14 @@ object FormMain: TFormMain
           TabOrder = 0
           TopIndex = -1
         end
+        object edtObjectTag: TEdit
+          Left = 0
+          Height = 31
+          Top = 280
+          Width = 276
+          TabOrder = 1
+          Text = 'edtObjectTag'
+        end
       end
       object TabLevel: TTabSheet
         Caption = 'Level'

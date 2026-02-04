@@ -35,6 +35,14 @@
             "y":"16",
             "width":"16",
             "height":"16"
+        },
+        {
+            "name":"door",
+            "actionName":"doorFR_1",
+            "x":"188",
+            "y":"262",
+            "width":"16",
+            "height":"64"
         }
     ]
 }
