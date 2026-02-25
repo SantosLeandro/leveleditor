@@ -31,7 +31,10 @@ type
     function LoadGLTexture(const FileName: string): GLuint;
     procedure glWrite(X, Y: GLfloat; Font: Pointer; Text: String);
     property Scale: integer read FScale write FScale;
-    property RenderColor: TRenderColor read FColor write FColor;
+    property ColorR: real read FColor.r write FColor.r;
+    property ColorG: real read FColor.g write FColor.g;
+    property ColorB: real read FColor.b write FColor.b;
+    property ColorA: real read FColor.a write FColor.a;
   end;
 
 implementation

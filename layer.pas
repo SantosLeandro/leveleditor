@@ -12,6 +12,7 @@ type
   TArrayGameObject = array of TGameObject;
 
 
+
   TLayer = class
   protected
     FName: string;

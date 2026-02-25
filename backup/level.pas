@@ -149,11 +149,9 @@ procedure TLevel.SaveCommand(l: integer; tile: integer; w: integer; h: integer);
 var
   oldTile: integer;
 begin
-  oldTile := GetData(l).Data[h][w];
-  if oldTile <> tile then
-  begin
+
    FStack.Push(TCommand.Create(l,tile,w,h));
-  end;
+
 end;
 
 function TLevel.Undo(out A: TCommand): Boolean;

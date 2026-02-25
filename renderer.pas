@@ -164,18 +164,18 @@ begin
   except
 
   end;
-  glEnable(GL_LINE_STIPPLE);
-  glLineStipple(2,43690);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glColor3f(1, 1, 1);
-  glLineWidth(2);
-  glBegin(GL_QUADS);
-
-     glVertex3f(0, 0, 0);
-     glVertex3f((High(arr[h])+1) * tile, 0, 0);
-     glVertex3f((High(arr[h])+1) * tile, (High(arr)+1) * tile, 0);
-     glVertex3f(0, (High(arr)+1) * tile, 0);
-  glEnd;
+  //glEnable(GL_LINE_STIPPLE);
+  //glLineStipple(2,43690);
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  //glColor3f(1, 1, 1);
+  //glLineWidth(2);
+  //glBegin(GL_QUADS);
+  //
+  //   glVertex3f(0, 0, 0);
+  //   glVertex3f((High(arr[h])+1) * tile, 0, 0);
+  //   glVertex3f((High(arr[h])+1) * tile, (High(arr)+1) * tile, 0);
+  //   glVertex3f(0, (High(arr)+1) * tile, 0);
+  //glEnd;
 end;
 
 procedure TRenderer.DrawGrid(Width: integer; Height: integer; t: integer);

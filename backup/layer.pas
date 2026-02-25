@@ -5,11 +5,12 @@ unit layer;
 interface
 
 uses
-  Classes, SysUtils, texture, gameobject;
+  Classes, SysUtils, texture, gameobject, fgl;
 
 type
   TIntegerArray = array of array of integer;
   TArrayGameObject = array of TGameObject;
+
 
 
   TLayer = class
@@ -22,6 +23,8 @@ type
     FHeight: integer;
     FGameObject: array of TGameObject;
     GameObjectIndex: integer;
+  public
+    Dict: specialize TFPGMap<string, TIntegerArray>;
   public
     constructor Create(Texture: TTexture; arr: TIntegerArray; Name: string);
     constructor Create(Texture: TTexture; strData: string; w: integer;
@@ -175,7 +178,6 @@ begin
      GameObject[index] := Go;
      GameObject[GameObjectIndex - 1] := nil;
      GameObjectIndex := GameObjectIndex - 1;
-  end;
 end;
 
 end.

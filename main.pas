@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, OpenGLContext,
-  GL, glu, glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer,
+  GL, glu, glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, world, room,
   GameObject, Vector2, FileHelper, Stack, ComCtrls, BCListBox,
   BGRASpriteAnimation, BGRABitmap, BCTypes, BGRAGraphicControl,BGRATransform,BGRABitmapTypes, Types;
 
@@ -47,7 +47,9 @@ type
     LeftPanel: TPanel;
     OpenDialog: TOpenDialog;
     MainStatusBar: TStatusBar;
+    TimerInit: TTimer;
     TrackBar1: TTrackBar;
+    procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure GLBoxClick(Sender: TObject);
@@ -83,6 +85,8 @@ type
   private
 
   public
+    World: TWorld;
+    roomName: String;
     Level: TLevel;
     Texture: TTexture;
     Renderer: TRenderer;
@@ -109,6 +113,7 @@ type
     GameObjectSelectedId: integer;
     function getTestMap: TIntegerArray;
     procedure InitLevel;
+    procedure OnInitTimer(Sender: TObject);
 
   end;
 
@@ -137,7 +142,7 @@ begin
     begin
       for j:=0 to high(tiles[i]) do
       begin
-        tiles[i][j] := -1;
+        tiles[i][j] := 0;
       end;
     end;
     result := tiles;
@@ -146,8 +151,42 @@ end;
 procedure TFormMain.InitLevel;
 var
   i: integer;
-
+  FirstRoom: TRoom;
+  SecondRoom: TRoom;
+  Texture2: TTexture;
+  tiledata: String;
 begin
+    Texture := TTexture.Create();
+    Texture2 := TTexture.Create();
+
+    tiledata := '1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1';
+
+
+    Texture.LoadFromFile('tileset_1616.png');
+    Texture2.LoadFromFile('tileset_1616.png');
+    World := TWorld.Create;
+    FirstRoom := TRoom.Create(1);
+    RoomName :=  'first_room';
+    FirstRoom.Name:= RoomName;
+    FirstRoom.AddLayer(TLayer.Create(Texture2,tileData,10,10,'background'));
+    FirstRoom.Width:= 10;
+    FirstRoom.Height:= 10;
+    FirstRoom.Tilesize:= 16;
+    FirstRoom.X := 0;
+    FirstRoom.Y := 0;
+    World.AddRoom(FirstRoom);
+
+    SecondRoom := TRoom.Create(1);
+    SecondRoom.Name:= 'second_room';
+    SecondRoom.AddLayer(TLayer.Create(Texture2,tileData,10,10,'background'));
+    SecondRoom.Width:= 10;
+    SecondRoom.Height:= 10;
+    SecondRoom.Tilesize:= 16;
+    SecondRoom.X := 10 * 16;
+    SecondRoom.Y := 0 * 16;
+    World.AddRoom(SecondRoom);
+
+
     LevelFile := TLevelFile.Create;
     //Level := Level.Load('level.json');
     Level := TLevel.Create(1);
@@ -155,7 +194,7 @@ begin
     Level.Width := 10;
     Level.Height := 10;
     Level.Scale := 1;
-    Texture := TTexture.Create();
+
     Level.Layer[0] := TLayer.Create(texture,getTestMap(),'background');
     LayerId := 0;
 
@@ -174,6 +213,12 @@ begin
     ListBoxObject.ItemIndex:= 0;
 end;
 
+procedure TFormMain.OnInitTimer(Sender: TObject);
+begin
+  TimerInit.Enabled := False; // executa uma vez
+  InitLevel;
+end;
+
 { TFormMain }
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
@@ -190,17 +235,27 @@ begin
   GLBox.OnKeyDown := @GLBoxKeyDown;
   GLBox.OnKeyUp := @GLBoxKeyUp;
   GLBox.OnMouseWheel := @GLBoxMouseWheel;
+  GLBox.MakeCurrent;
   Renderer := TRenderer.Create;
   canMove := false;
   scale := 1;
   OffsetX:=0;
   OffsetY:=0;
   LayerId := 0;
-  InitLevel;
   EdMode := 'tile';
   MouseRightBtn:=false;
   Zoom := 1;
   GameObjectSelectedId:= -1;
+  InitLevel;
+
+  //TimerInit.Interval := 2000; // 2 segundos
+  //TimerInit.Enabled := True;
+  //TimerInit.OnTimer := @OnInitTimer;
+
+end;
+
+procedure TFormMain.FormActivate(Sender: TObject);
+begin
 
 end;
 
@@ -247,18 +302,31 @@ var
    objX, objY: integer;
    goName: string;
    goId: integer;
+   Room: TRoom;
+   tmpLayer: TLayer;
 begin
    MouseLeftBtn := false;
    posX := (x - offsetX) div (Level.tileSize * Scale);
    posY := (y - offsetY) div (Level.tileSize * Scale);
+
+   Room := world.GetRoom(posX,posY);
+   if (Room <> nil) then
+   begin
+     Room.Layer[0].Data[PosY][PosX] := tileId;
+     MainStatusBar.SimpleText:= Room.Name;
+     GLBox.Invalidate;
+   end;
+   //tmpLayer := Room.Layer[0];
+
    if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
    begin
     if Button = mbLeft then
        begin
           MouseLeftBtn := true;
-
           if (EdMode = 'tile') then
           begin
+
+
              if Level.Layer[LayerId].Data[posY][posX] <> tileId then
              begin
                   Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
@@ -288,14 +356,9 @@ begin
           end
           else
           begin
-            //objX :=  posX * level.tilesize;
-            //objY :=  posY * level.tilesize;
             objx := (x - offsetx) div scale;
             objy := (y - offsety) div scale;
-            //MainStatusBar.SimpleText:= 'OBJX '+IntToStr(objX)+' OBJY '+IntToStr(objY);
             GameObjectSelectedId := Level.Layer[LayerId].GetGameObject(objX,objY);
-            //Level.Layer[LayerId].RemoveGameObject(objX,objY);
-            //MainStatusBar.SimpleText:= 'GOID '+IntToStr(goId);
           end;
        end;
        GLBox.invalidate;
@@ -412,6 +475,9 @@ var
    i: integer;
    j: integer;
    go: TSprite;
+   l: integer;
+   tmpLayer: TLayer;
+   tmpName: String;
 begin
   Renderer.ColorR := 1.0;
   Renderer.ColorG := 1.0;
@@ -424,7 +490,7 @@ begin
   if(texture.id = 0) then
   begin
    texture := TTexture.Create();
-   texture.LoadFromFile('gameobject.png');
+   texture.LoadFromFile('tileset_1616.png');
   end;
 
   // prepare to draw
@@ -433,43 +499,75 @@ begin
   Renderer.ClearScreen;
   Renderer.Mode2D;
   //glScalef(scale,scale,0);
-  glTranslatef(offsetX,offsetY,0);
+
+  if( world <> nil) then
+  begin
+       for i:= 0 to World.RoomCount - 1 do
+       begin
+          glLoadIdentity();
+          glTranslatef(world.GetRoom(i).X * Renderer.Scale ,world.GetRoom(i).Y * Renderer.Scale,0);
+          glTranslatef(offsetX, offsetY, 0);
+
+          Renderer.DrawBackground(
+            world.GetRoom(i).Width,
+            world.GetRoom(i).Height,
+            world.GetRoom(i).Tilesize
+          );
+
+          Renderer.DrawGrid(
+            world.GetRoom(i).Width,
+            world.GetRoom(i).Height,
+            world.GetRoom(i).Tilesize
+          );
+          for l := 0 to world.GetRoom(i).LayerCount -1 do
+          begin
+             //tmpLayer := world.GetRoom(i).Layer[l];
+             //tmpName :=  tmpLayer.Name;
+
+             Renderer.DrawTilemap(world.GetRoom(i).Layer[l].Data, world.GetRoom(i).Layer[l].texture, world.GetRoom(i).Tilesize);
+          end;
+
+       end;
+
+  end;
 
   // draw level
-  if( level <> nil ) then
+  if( level <> nil) and (1 = 2 ) then
   begin
-    Renderer.DrawBackground(level.width,level.height,Level.TileSize);
-    Renderer.DrawGrid(level.width,level.height,Level.TileSize);
-    for i := 0 to Level.LayerCount do
-    begin
-      Renderer.ColorA  := 0.5;
-      if(i = layerId) then
-           Renderer.ColorA := 1.0;
-      Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
-
-      for j:=0 to High(Level.Layer[i].GameObject) do
-      begin
-         if (Level.Layer[i].GameObject[j] <> nil) then
-         begin
-           if(j = GameObjectSelectedId ) then
-           begin
-                Renderer.ColorG := 0.0;
-                Renderer.ColorB := 0.0
-           end
-           else
-           begin
-               Renderer.ColorG := 1.0;
-               Renderer.ColorB := 1.0;
-           end;
-
-           Renderer.DrawGameObject(
-             Level.Layer[i].GameObject[j].x,
-             Level.Layer[i].GameObject[j].y,
-             LevelFile.GetSprite(Level.Layer[i].GameObject[j].Name),
-             Texture);
-         end;
-      end;
-    end;
+    //glTranslatef(world.GetRoomByName(RoomName).X, world.GetRoomByName(RoomName).Y,0);
+    //glTranslatef(offsetX,offsetY,0);
+    //Renderer.DrawBackground(world.GetRoomByName(RoomName).Width,world.GetRoomByName(RoomName).Height,Level.TileSize);
+    //Renderer.DrawGrid(world.GetRoomByName(RoomName).Width,world.GetRoomByName(RoomName).Height, World.GetRoomByName(RoomName).Tilesize);
+    //for i := 0 to Level.LayerCount do
+    //begin
+    //  Renderer.ColorA  := 0.5;
+    //  if(i = layerId) then
+    //       Renderer.ColorA := 1.0;
+    //  Renderer.DrawTilemap(Level.Layer[i].data,Level.Layer[i].texture, Level.Tilesize);
+    //
+    //  for j:=0 to High(Level.Layer[i].GameObject) do
+    //  begin
+    //     if (Level.Layer[i].GameObject[j] <> nil) then
+    //     begin
+    //       if(j = GameObjectSelectedId ) then
+    //       begin
+    //            Renderer.ColorG := 0.0;
+    //            Renderer.ColorB := 0.0
+    //       end
+    //       else
+    //       begin
+    //           Renderer.ColorG := 1.0;
+    //           Renderer.ColorB := 1.0;
+    //       end;
+    //
+    //       Renderer.DrawGameObject(
+    //         Level.Layer[i].GameObject[j].x,
+    //         Level.Layer[i].GameObject[j].y,
+    //         LevelFile.GetSprite(Level.Layer[i].GameObject[j].Name),
+    //       Texture);
+    //     end;
+    //  end;
+    //end;
    end;
 
 
@@ -489,6 +587,8 @@ begin
   else
   begin
   // Draw Mouse Cursor
+   glLoadIdentity();
+   glTranslatef(offsetX, offsetY, 0);
    glBindTexture(GL_TEXTURE_2D, 0);
    glColor4f(1,1,0,0.2);
    glBegin(GL_QUADS);

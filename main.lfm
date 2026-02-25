@@ -8,6 +8,7 @@ object FormMain: TFormMain
   ClientWidth = 1123
   Menu = MainMenu
   LCLVersion = '4.4.0.0'
+  OnActivate = FormActivate
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   object LeftPanel: TPanel
@@ -280,5 +281,9 @@ object FormMain: TFormMain
   object SaveDialog: TSaveDialog
     Left = 856
     Top = 8
+  end
+  object TimerInit: TTimer
+    Left = 1016
+    Top = 208
   end
 end
