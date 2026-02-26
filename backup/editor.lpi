@@ -100,6 +100,11 @@
         <Filename Value="world.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="worldfile.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="WorldFile"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

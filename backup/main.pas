@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, OpenGLContext,
-  GL, glu, glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, world, room,
+  GL, glu, glut, ExtCtrls, renderer, texture, StdCtrls, Level, Layer, world, room, worldFile,
   GameObject, Vector2, FileHelper, Stack, ComCtrls, BCListBox,
   BGRASpriteAnimation, BGRABitmap, BCTypes, BGRAGraphicControl,BGRATransform,BGRABitmapTypes, Types;
 
@@ -22,6 +22,8 @@ type
     EdtLvlHeight: TLabeledEdit;
     EdtLvlName: TLabeledEdit;
     EdtLvlTilesize: TLabeledEdit;
+    GroupBox1: TGroupBox;
+    listBoxRooms: TListBox;
     ListBoxObject: TListBox;
     MemoProps: TMemo;
     MainPageControl: TPageControl;
@@ -67,6 +69,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
+    procedure listBoxRoomsSelectionChange(Sender: TObject; User: boolean);
     procedure menuUndoClick(Sender: TObject);
     procedure MenuItemSaveAsClick(Sender: TObject);
     procedure MenuItemSaveClick(Sender: TObject);
@@ -91,6 +94,7 @@ type
     Texture: TTexture;
     Renderer: TRenderer;
     LevelFile: TLevelFile;
+    WorldFile: TWorldFile;
     tileSize: integer;
     Tilemap : TIntegerArray;
     LayerId: integer;
@@ -142,7 +146,7 @@ begin
     begin
       for j:=0 to high(tiles[i]) do
       begin
-        tiles[i][j] := 2;
+        tiles[i][j] := 0;
       end;
     end;
     result := tiles;
@@ -159,7 +163,7 @@ begin
     Texture := TTexture.Create();
     Texture2 := TTexture.Create();
 
-    tiledata := '1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1';
+    tiledata := '1,1,1,1,1,1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1';
 
 
     Texture.LoadFromFile('tileset_1616.png');
@@ -183,10 +187,15 @@ begin
     SecondRoom.Height:= 10;
     SecondRoom.Tilesize:= 16;
     SecondRoom.X := 10 * 16;
-    SecondRoom.Y := 0 * 16;
+    SecondRoom.Y := 5 * 16;
     World.AddRoom(SecondRoom);
 
 
+    listBoxRooms.AddItem(FirstRoom.Name, FirstRoom);
+    listBoxRooms.AddItem(SecondRoom.Name, SecondRoom);
+
+
+    WorldFile := TWorldFile.Create;
     LevelFile := TLevelFile.Create;
     //Level := Level.Load('level.json');
     Level := TLevel.Create(1);
@@ -300,23 +309,38 @@ procedure TFormMain.GLBoxMouseDown(Sender: TObject; Button: TMouseButton;
 var
    posX, posY: integer;
    objX, objY: integer;
+   roomX, roomY: integer;
    goName: string;
    goId: integer;
    Room: TRoom;
    tmpLayer: TLayer;
 begin
    MouseLeftBtn := false;
+   MouseRightBtn := false;
    posX := (x - offsetX) div (Level.tileSize * Scale);
    posY := (y - offsetY) div (Level.tileSize * Scale);
 
    Room := world.GetRoom(posX,posY);
-   if (Room <> nil) then
+
+   if (Room <> nil) and (Button = mbLeft) then
    begin
-     Room.Layer[0].Data[PosY][PosX] := tileId;
+     MouseLeftBtn := true;
+     roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
+     roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
+     Room.Layer[LayerId].Data[roomY][roomX] := tileId;
      MainStatusBar.SimpleText:= Room.Name;
      GLBox.Invalidate;
    end;
-   //tmpLayer := Room.Layer[0];
+
+   if (Room <> nil) and (Button = mbRight) then
+   begin
+     MouseRightBtn := true;
+     roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
+     roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
+     Room.Layer[LayerId].Data[roomY][roomX] := -1;
+     MainStatusBar.SimpleText:= Room.Name;
+     GLBox.Invalidate;
+   end;
 
    if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
    begin
@@ -505,7 +529,7 @@ begin
        for i:= 0 to World.RoomCount - 1 do
        begin
           glLoadIdentity();
-          //glTranslatef(world.GetRoom(i).X * Renderer.Scale ,world.GetRoom(i).Y * Renderer.Scale,0);
+          glTranslatef(world.GetRoom(i).X * Renderer.Scale ,world.GetRoom(i).Y * Renderer.Scale,0);
           glTranslatef(offsetX, offsetY, 0);
 
           Renderer.DrawBackground(
@@ -613,6 +637,12 @@ begin
   end;
 end;
 
+procedure TFormMain.listBoxRoomsSelectionChange(Sender: TObject; User: boolean);
+begin
+  if listBoxRooms.ItemIndex <> -1 then
+    RoomName := listBoxRooms.Items[listBoxRooms.ItemIndex];
+end;
+
 procedure TFormMain.menuUndoClick(Sender: TObject);
 var
    oldCommand :TCommand;
@@ -629,13 +659,13 @@ procedure TFormMain.MenuItemSaveAsClick(Sender: TObject);
 begin
    if SaveDialog.Execute then
    begin
-     LevelFile.Save(SaveDialog.filename,Level);
+    WorldFile.Save(SaveDialog.filename,World);
    end;
 end;
 
 procedure TFormMain.MenuItemSaveClick(Sender: TObject);
 begin
-    LevelFile.Save('testSave.json',Level);
+    LevelFile.Save('rooms.json',World);
 end;
 
 procedure TFormMain.MenuItemOpenClick(Sender: TObject);

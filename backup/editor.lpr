@@ -10,7 +10,8 @@ uses
    {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, lazopenglcontext, main, loader, texture, level, layer, vector2,
-  FileHelper, gameobject, stack, tilemap, room { you can add units after this };
+  FileHelper, gameobject, stack, tilemap, room,
+world { you can add units after this };
 
 {$R *.res}
 
