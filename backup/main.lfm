@@ -47,9 +47,9 @@ object FormMain: TFormMain
       Height = 330
       Top = 353
       Width = 286
-      ActivePage = TabLevel
+      ActivePage = TabTileset
       Align = alClient
-      TabIndex = 2
+      TabIndex = 0
       TabOrder = 1
       object TabTileset: TTabSheet
         Caption = 'Tileset'
@@ -64,8 +64,8 @@ object FormMain: TFormMain
           VertScrollBar.Page = 192
           Align = alClient
           BorderSpacing.Around = 2
-          ClientHeight = 248
-          ClientWidth = 268
+          ClientHeight = 250
+          ClientWidth = 270
           TabOrder = 0
           object Tileset: TBGRAGraphicControl
             Left = 0
@@ -186,6 +186,84 @@ object FormMain: TFormMain
           TabOrder = 5
         end
       end
+      object TabSheet1: TTabSheet
+        Caption = 'Room'
+        ClientHeight = 299
+        ClientWidth = 276
+        object edtRoomName: TEdit
+          Left = 8
+          Height = 31
+          Top = 16
+          Width = 256
+          TabOrder = 0
+          Text = 'edtRoomName'
+        end
+        object edtRoomWidth: TEdit
+          Left = 8
+          Height = 31
+          Top = 56
+          Width = 256
+          TabOrder = 1
+          Text = 'edtRoomWidth'
+        end
+        object edtRoomHeight: TEdit
+          Left = 8
+          Height = 31
+          Top = 96
+          Width = 256
+          TabOrder = 2
+          Text = 'edtRoomHeight'
+        end
+        object edtRoomTilesize: TEdit
+          Left = 8
+          Height = 31
+          Top = 141
+          Width = 256
+          TabOrder = 3
+          Text = 'edtRoomTilesize'
+        end
+        object editRoomX: TEdit
+          Left = 8
+          Height = 31
+          Top = 184
+          Width = 120
+          TabOrder = 4
+          Text = 'editRoomX'
+        end
+        object edtRoomY: TEdit
+          Left = 144
+          Height = 31
+          Top = 184
+          Width = 120
+          TabOrder = 5
+          Text = 'edtRoomY'
+        end
+        object btnRoomApply: TButton
+          Left = 8
+          Height = 25
+          Top = 232
+          Width = 75
+          Caption = 'Apply'
+          TabOrder = 6
+          OnClick = btnRoomApplyClick
+        end
+        object btnRoomDelete: TButton
+          Left = 189
+          Height = 25
+          Top = 232
+          Width = 75
+          Caption = 'Delete'
+          TabOrder = 7
+        end
+        object btnRoomNew: TButton
+          Left = 96
+          Height = 25
+          Top = 232
+          Width = 75
+          Caption = 'New'
+          TabOrder = 8
+        end
+      end
     end
     object RadioEditing: TRadioGroup
       Left = 1
@@ -292,6 +370,10 @@ object FormMain: TFormMain
         Caption = 'Undo'
         ShortCut = 16474
         OnClick = menuUndoClick
+      end
+      object menuDelete: TMenuItem
+        Caption = 'Delete'
+        OnClick = menuDeleteClick
       end
     end
   end

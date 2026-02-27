@@ -5,7 +5,7 @@ unit layer;
 interface
 
 uses
-  Classes, SysUtils, texture, gameobject, fgl;
+  Classes, SysUtils, texture, gameobject;
 
 type
   TIntegerArray = array of array of integer;
@@ -23,8 +23,6 @@ type
     FHeight: integer;
     FGameObject: array of TGameObject;
     GameObjectIndex: integer;
-  public
-    Dict: specialize TFPGMap<string, TIntegerArray>;
   public
     constructor Create(Texture: TTexture; arr: TIntegerArray; Name: string);
     constructor Create(Texture: TTexture; strData: string; w: integer;

@@ -38,6 +38,7 @@ type
     property GameObject: TArrayGameObject read FGameObject write FGameObject;
     function GetDataToString(): string;
     function GetGameObject(x: integer; y: integer): integer;
+    procedure Resize(NewWidth, NewHeight: Integer);
 
   end;
 
@@ -176,6 +177,31 @@ begin
      GameObject[index] := Go;
      GameObject[GameObjectIndex - 1] := nil;
      GameObjectIndex := GameObjectIndex - 1;
+end;
+
+procedure TLayer.Resize(NewWidth, NewHeight: Integer);
+var
+  NewData: TIntegerArray;
+  x, y: Integer;
+begin
+  // cria novo array
+  SetLength(NewData, NewHeight);
+  for y := 0 to NewHeight - 1 do
+    SetLength(NewData[y], NewWidth);
+
+  // copia dados antigos
+  for y := 0 to NewHeight - 1 do
+  begin
+    for x := 0 to NewWidth - 1 do
+    begin
+      if (y <= High(Data)) and (x <= High(Data[0])) then
+        NewData[y][x] := Data[y][x]
+      else
+        NewData[y][x] := -1; // tile vazio
+    end;
+  end;
+
+  Data := NewData;
 end;
 
 end.

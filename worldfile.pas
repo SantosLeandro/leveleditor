@@ -69,76 +69,79 @@ end;
 
 function TWorldFile.Load(filename: string): TWorld;
 var
-  level: TWorld;
   fileStream: TFileStream;
   jData: TJSONData;
-  jObject: TJSONObject;
-  jSprite: TJSONObject;
-  jArray: TJSONArray;
-  jArrRoom: TJSONArray;
+  jRoomArr: TJSONArray;
+  jLayerArr: TJSONArray;
   jGameObject: TJSONArray;
-  entityArray: TJSONArray;
-  P: TJSONParser;
-  i, j, z: integer;
-  strData: TStringArray;
-  tmpData: string;
+  i, j, k: integer;
+  World: TWorld;
+  Room: TRoom;
+  Layer: TLayer;
   Texture: TTexture;
+  tmpData: string;
   w, h: integer;
   layerName: string;
-  tmpSprite: TSprite;
-  Room: TRoom;
+  sprite: TSprite;
 begin
-  //create world
-  level := TWorld.Create();
+  World := TWorld.Create;
 
   fileStream := TFileStream.Create(filename, fmOpenRead);
   jData := GetJSON(fileStream);
 
-  //GetRooms
-  jArrRoom := jData.GetPath('room') as TJSONArray;
+  jRoomArr := jData.GetPath('room') as TJSONArray;
 
+  for i := 0 to jRoomArr.Count - 1 do
+  begin
+    Room := TRoom.Create(1);
 
+    Room.Name := jRoomArr[i].GetPath('name').AsString;
+    Room.Width := jRoomArr[i].GetPath('width').AsInteger;
+    Room.Height := jRoomArr[i].GetPath('height').AsInteger;
+    Room.Tilesize := jRoomArr[i].GetPath('tilesize').AsInteger;
+    Room.X := jRoomArr[i].GetPath('x').AsInteger;
+    Room.Y := jRoomArr[i].GetPath('y').AsInteger;
 
-  jArray := jArrRoom.GetPath('layer') as TJSONArray;
+    jLayerArr := jRoomArr[i].GetPath('layer') as TJSONArray;
 
-  //level.Name := jData.GetPath('name').AsString;
-  //level.Width := jData.GetPath('width').AsInteger;
-  //level.Height := jData.GetPath('height').AsInteger;
-  //level.Tilesize :=  jData.GetPath('tilesize').AsInteger;
-  //for i := 0 to jArray.Count - 1 do
-  //begin
-  //  Texture := TTexture.Create();
-  //  Texture.LoadFromFile(jArray[i].GetPath('texture').AsString);
-  //  tmpData := jArray[i].GetPath('data').AsString;
-  //  w := jArray[i].GetPath('width').AsInteger;
-  //  h := jArray[i].GetPath('height').AsInteger;
-  //  layerName := jArray[i].GetPath('name').AsString;
-  //  //level.AddRoom();.Create(texture, tmpData, w, h, layerName);
-  //
-  //  jGameObject := jArray[i].GetPath('gameobject') as TJSONArray;
-  //  if(jGameObject.Count > 0 ) then
-  //  begin
-  //    for j := 0 to jGameObject.count - 1 do
-  //    begin
-  //        try
-  //           level.layer[i].AddGameObject(
-  //              jGameObject[j].GetPath('x').AsInteger,
-  //              jGameObject[j].GetPath('y').AsInteger,
-  //              GetSprite(jGameObject[j].GetPath('name').AsString).w,
-  //              GetSprite(jGameObject[j].GetPath('name').AsString).h,
-  //              jGameObject[j].GetPath('name').AsString
-  //           );
-  //
-  //        finally
-  //
-  //
-  //        end;
-  //
-  //    end;
-  //  end;
-  //end;
-  fileStream.Destroy;
-  Result := level;
+    for j := 0 to jLayerArr.Count - 1 do
+    begin
+      Texture := TTexture.Create;
+      Texture.LoadFromFile(jLayerArr[j].GetPath('texture').AsString);
+
+      tmpData := jLayerArr[j].GetPath('data').AsString;
+      w := jLayerArr[j].GetPath('width').AsInteger;
+      h := jLayerArr[j].GetPath('height').AsInteger;
+      layerName := jLayerArr[j].GetPath('name').AsString;
+
+      Layer := TLayer.Create(Texture, tmpData, w, h, layerName);
+      Room.AddLayer(Layer);
+
+      // Load GameObjects
+      jGameObject := jLayerArr[j].GetPath('gameobject') as TJSONArray;
+
+      if jGameObject <> nil then
+      begin
+        for k := 0 to jGameObject.Count - 1 do
+        begin
+          sprite := GetSprite(jGameObject[k].GetPath('name').AsString);
+
+          Layer.AddGameObject(
+            jGameObject[k].GetPath('x').AsInteger,
+            jGameObject[k].GetPath('y').AsInteger,
+            sprite.w,
+            sprite.h,
+            jGameObject[k].GetPath('name').AsString
+          );
+        end;
+      end;
+    end;
+
+    World.AddRoom(Room);
+  end;
+
+  fileStream.Free;
+  Result := World;
 end;
 
 procedure TWorldFile.Save(filename: string; World: TWorld);

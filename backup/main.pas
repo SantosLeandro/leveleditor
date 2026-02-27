@@ -17,6 +17,15 @@ type
   TFormMain = class(TForm)
 
     BtnApply: TButton;
+    btnRoomApply: TButton;
+    btnRoomDelete: TButton;
+    btnRoomNew: TButton;
+    edtRoomHeight: TEdit;
+    edtRoomTilesize: TEdit;
+    editRoomX: TEdit;
+    edtRoomY: TEdit;
+    edtRoomWidth: TEdit;
+    edtRoomName: TEdit;
     edtObjectTag: TEdit;
     EdtLvlWidth: TLabeledEdit;
     EdtLvlHeight: TLabeledEdit;
@@ -28,10 +37,12 @@ type
     MemoProps: TMemo;
     MainPageControl: TPageControl;
     MenuItem3: TMenuItem;
+    menuDelete: TMenuItem;
     menuUndo: TMenuItem;
     RadioEditing: TRadioGroup;
     SaveDialog: TSaveDialog;
     ScrollBox1: TScrollBox;
+    TabSheet1: TTabSheet;
     TabTileset: TTabSheet;
     TabGameObject: TTabSheet;
     TabLevel: TTabSheet;
@@ -51,6 +62,7 @@ type
     MainStatusBar: TStatusBar;
     TimerInit: TTimer;
     TrackBar1: TTrackBar;
+    procedure btnRoomApplyClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -70,6 +82,7 @@ type
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
     procedure listBoxRoomsSelectionChange(Sender: TObject; User: boolean);
+    procedure menuDeleteClick(Sender: TObject);
     procedure menuUndoClick(Sender: TObject);
     procedure MenuItemSaveAsClick(Sender: TObject);
     procedure MenuItemSaveClick(Sender: TObject);
@@ -88,6 +101,7 @@ type
   private
 
   public
+    CurrentWorldFile: String;
     World: TWorld;
     roomName: String;
     Level: TLevel;
@@ -118,6 +132,7 @@ type
     function getTestMap: TIntegerArray;
     procedure InitLevel;
     procedure OnInitTimer(Sender: TObject);
+    procedure LoadRoomToEdits;
 
   end;
 
@@ -129,6 +144,22 @@ var
 implementation
 
 {$R *.lfm}
+
+procedure TFormMain.LoadRoomToEdits;
+var
+  Room: TRoom;
+begin
+  Room := World.GetRoomByName(RoomName);
+
+  if Room = nil then Exit;
+
+  edtRoomName.Text     := Room.Name;
+  edtRoomWidth.Text    := IntToStr(Room.Width);
+  edtRoomHeight.Text   := IntToStr(Room.Height);
+  edtRoomTilesize.Text := IntToStr(Room.Tilesize);
+  editRoomX.Text       := IntToStr(Room.X);
+  edtRoomY.Text        := IntToStr(Room.Y);
+end;
 
 function TFormMain.getTestMap: TIntegerArray;
 var
@@ -166,7 +197,7 @@ begin
     tiledata := '1,1,1,1,1,1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1';
 
 
-    Texture.LoadFromFile('tileset_1616.png');
+    Texture.LoadFromFile('gameobject.png');
     Texture2.LoadFromFile('tileset_1616.png');
     World := TWorld.Create;
     FirstRoom := TRoom.Create(1);
@@ -268,6 +299,48 @@ begin
 
 end;
 
+procedure TFormMain.btnRoomApplyClick(Sender: TObject);
+var
+  Room: TRoom;
+  oldWidth, oldheight:integer;
+begin
+  // pega o room atual
+  Room := World.GetRoomByName(RoomName);
+
+  if Room = nil then
+  begin
+    ShowMessage('Room não encontrada');
+    Exit;
+  end;
+
+  oldWidth:= Room.Width;
+  oldheight:= Room.Height;
+  // aplica os valores dos edits
+  Room.Name     := edtRoomName.Text;
+  Room.Width    := StrToIntDef(edtRoomWidth.Text, Room.Width);
+  Room.Height   := StrToIntDef(edtRoomHeight.Text, Room.Height);
+  Room.Tilesize := StrToIntDef(edtRoomTilesize.Text, Room.Tilesize);
+  Room.X        := StrToIntDef(editRoomX.Text, Room.X);
+  Room.Y        := StrToIntDef(edtRoomY.Text, Room.Y);
+
+  // atualiza nome atual se mudou
+  RoomName := Room.Name;
+
+  // redimensiona tilemap
+
+  if( oldheight <> Room.Height) or ( oldWidth <> Room.Width) then
+  begin
+       Room.ResizeLayers;
+  end;
+
+
+  // atualiza listbox
+  if listBoxRooms.ItemIndex <> -1 then
+    listBoxRooms.Items[listBoxRooms.ItemIndex] := Room.Name;
+
+  GLBox.Invalidate;
+end;
+
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -289,6 +362,11 @@ begin
       Level.Layer[LayerId].RemoveGameObject(GameObjectSelectedId);
       GameObjectSelectedId:= -1;
         GLBox.Invalidate;
+    end;
+
+    if(EdMode = 'tile') then
+    begin
+      tileId := 0;
     end;
   end;
 end;
@@ -322,23 +400,41 @@ begin
 
    Room := world.GetRoom(posX,posY);
 
-   if (Room <> nil) and (Button = mbLeft) then
+   if (Room <> nil) and (Button = mbLeft) and (EdMode = 'tile') then
    begin
      MouseLeftBtn := true;
-     roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
-     roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
+     roomX := (x - (room.X*scale) - offsetX) div (Room.tileSize * Scale);
+     roomY := (y - (room.Y*scale) - offsetY) div (Room.tileSize * Scale);
      Room.Layer[LayerId].Data[roomY][roomX] := tileId;
      MainStatusBar.SimpleText:= Room.Name;
      GLBox.Invalidate;
    end;
 
-   if (Room <> nil) and (Button = mbRight) then
+   //Right não vai mais excluir vai ser seleção
+   if (Room <> nil) and (Button = mbRight) and (EdMode = 'tile') then
    begin
-     MouseRightBtn := true;
-     roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
-     roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
-     Room.Layer[LayerId].Data[roomY][roomX] := -1;
-     MainStatusBar.SimpleText:= Room.Name;
+     RoomName := Room.Name;
+     LoadRoomToEdits;
+     //MouseRightBtn := true;
+     //roomX := (x - (room.X*scale) - offsetX) div (Room.tileSize * Scale);
+     //roomY := (y - (room.Y*scale) - offsetY) div (Room.tileSize * Scale);
+     //Room.Layer[LayerId].Data[roomY][roomX] := -1;
+     //MainStatusBar.SimpleText:= Room.Name;
+     //GLBox.Invalidate;
+   end;
+
+
+   if (Room <> nil) and (Button = mbLeft) and (EdMode <> 'tile') then
+   begin
+     goName := ListBoxObject.GetSelectedText;
+     objX := (x - (room.X*scale) - offsetX) div ( Scale);
+     objY := (y - (room.Y*scale) - offsetY) div ( Scale);
+     Room.Layer[LayerId].AddGameObject(
+       objX,
+       objY,
+       goName
+     );
+     MainStatusBar.SimpleText:= 'ADD GAME OBJ '+goName;
      GLBox.Invalidate;
    end;
 
@@ -402,11 +498,25 @@ var
    deltax,deltay: integer;
    objx,objy:integer;
    posX, posY: integer;
+   roomX, roomY: integer;
+   Room: TRoom;
 begin
      DeltaX := X - OldMouseX;
      DeltaY := Y - OldMouseY;
      OldMouseX := X;
      OldMouseY := Y;
+
+     posX := (X - offsetX) div (Level.tileSize * Scale);
+     posY := (Y - offsetY) div (Level.tileSize * Scale);
+
+     Room := world.GetRoom(posX,posY);
+     if (Room <> nil) and (MouseLeftBtn) and (EdMode = 'tile') then
+     begin
+       roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
+       roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
+       Room.Layer[LayerId].Data[roomY][roomX] := tileId;
+       GLBox.Invalidate;
+     end;
 
      if MouseMiddleBtn then
      begin
@@ -500,6 +610,7 @@ var
    j: integer;
    go: TSprite;
    l: integer;
+   k: integer;
    tmpLayer: TLayer;
    tmpName: String;
 begin
@@ -514,7 +625,7 @@ begin
   if(texture.id = 0) then
   begin
    texture := TTexture.Create();
-   texture.LoadFromFile('tileset_1616.png');
+   texture.LoadFromFile('gameobject.png');
   end;
 
   // prepare to draw
@@ -545,14 +656,24 @@ begin
           );
           for l := 0 to world.GetRoom(i).LayerCount -1 do
           begin
-             //tmpLayer := world.GetRoom(i).Layer[l];
+
              //tmpName :=  tmpLayer.Name;
 
              Renderer.DrawTilemap(world.GetRoom(i).Layer[l].Data, world.GetRoom(i).Layer[l].texture, world.GetRoom(i).Tilesize);
+             tmpLayer := world.GetRoom(i).Layer[l];
+             for k := 0 to High(tmpLayer.GameObject) do
+             begin
+               if(tmpLayer.GameObject[k] <> nil) then
+               begin
+                 Renderer.DrawGameObject(
+                   tmpLayer.GameObject[k].x,
+                   tmpLayer.GameObject[k].y,
+                   LevelFile.GetSprite(tmpLayer.GameObject[k].Name),
+                 Texture);
+               end;
+             end;
           end;
-
        end;
-
   end;
 
   // draw level
@@ -597,13 +718,15 @@ begin
 
   if(EdMode <> 'tile') then
   begin
+     glLoadIdentity();
+     glTranslatef(offsetX, offsetY, 0);
      Renderer.ColorR := 0.0;
      Renderer.ColorG := 1.0;
      Renderer.ColorB := 0.0;
      Renderer.ColorA := 0.3;
      Renderer.DrawGameObject(
-           (oldMouseX - OffsetX) div scale,
-           (oldMouseY - OffsetY) div scale,
+           (OldMouseX - OffsetX) div scale,
+           (OldMouseY - OffsetY) div scale,
            LevelFile.GetSprite(ListBoxObject.GetSelectedText),
            Texture);
 
@@ -643,6 +766,11 @@ begin
     RoomName := listBoxRooms.Items[listBoxRooms.ItemIndex];
 end;
 
+procedure TFormMain.menuDeleteClick(Sender: TObject);
+begin
+
+end;
+
 procedure TFormMain.menuUndoClick(Sender: TObject);
 var
    oldCommand :TCommand;
@@ -660,38 +788,69 @@ begin
    if SaveDialog.Execute then
    begin
     WorldFile.Save(SaveDialog.filename,World);
+    CurrentWorldFile := SaveDialog.FileName;
    end;
 end;
 
 procedure TFormMain.MenuItemSaveClick(Sender: TObject);
 begin
-    LevelFile.Save('rooms.json',World);
+  if CurrentWorldFile = '' then
+  begin
+    if SaveDialog.Execute then
+    begin
+      CurrentWorldFile := SaveDialog.FileName;
+      WorldFile.Save(CurrentWorldFile, World);
+    end;
+  end
+  else
+  begin
+    WorldFile.Save(CurrentWorldFile, World);
+  end;
 end;
 
 procedure TFormMain.MenuItemOpenClick(Sender: TObject);
 var
-   I: integer;
+  i: Integer;
+  Room: TRoom;
 begin
-   if OpenDialog.Execute then
+  if OpenDialog.Execute then
+  begin
+    if FileExists(OpenDialog.FileName) then
     begin
-      if fileExists(OpenDialog.Filename) then
-        Level.free;
-        Level := LevelFile.Load(OpenDialog.Filename);
-        ListBoxLayers.Clear;
-        for i:= 0 to Level.LayerCount do
-        begin
-           ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
-        end;
-        Tileset.Invalidate;
-        EdtLvlWidth.Text := IntToStr(Level.Width);
-        EdtLvlHeight.Text := IntToStr(Level.Height);
-        EdtLvlTilesize.Text := IntToStr(Level.Tilesize);
-        EdtLvlName.Text := Level.Name;
-        MemoProps.Append(Level.Props);
+      if World <> nil then
+        World.Free;
+
+      CurrentWorldFile:= OpenDialog.FileName;
+
+      World := WorldFile.Load(OpenDialog.FileName);
+
+      // pega primeira room
+      Room := World.GetRoom(0);
+
+      ListBoxLayers.Clear;
+
+      for i := 0 to Room.LayerCount - 1 do
+      begin
+        ListBoxLayers.AddItem(Room.Layer[i].Name, Room.Layer[i]);
+      end;
+
+      Tileset.Invalidate;
+
+      EdtLvlWidth.Text := IntToStr(Room.Width);
+      EdtLvlHeight.Text := IntToStr(Room.Height);
+      EdtLvlTilesize.Text := IntToStr(Room.Tilesize);
+      EdtLvlName.Text := Room.Name;
+
+      MemoProps.Clear;
+      //MemoProps.Append(World.Props);
     end
     else
-      ShowMessage('No file selected');
-    end;
+      ShowMessage('Arquivo não encontrado');
+  end
+  else
+    ShowMessage('Nenhum arquivo selecionado');
+end;
+
 
 procedure TFormMain.RadioEditingItemEnter(Sender: TObject);
 begin
@@ -726,10 +885,10 @@ var
 begin
   //col := x div Level.Tilesize;
   //row := y div Level.Tilesize;
-   col := TilesetCursor.x div (Level.Tilesize * zoom);
-   row := TilesetCursor.y div (Level.Tilesize * zoom);
+   col := TilesetCursor.x div (World.GetRoomByName(RoomName).tilesize * zoom);
+   row := TilesetCursor.y div (World.GetRoomByName(RoomName).tilesize * zoom);
    MainStatusBar.SimpleText := 'COL: ' + IntToStr(Col);
-   tileId := col + (row * ( Level.Layer[LayerId].Texture.Width div Level.Tilesize));
+   tileId := col + (row * ( World.GetRoomByName(RoomName).Layer[LayerId].Texture.Width div Level.Tilesize));
 end;
 
 procedure TFormMain.TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -803,20 +962,20 @@ begin
   mx :=  TilesetCursor.x;
   my :=  TilesetCursor.y;
   rect.Top:= my;
-  rect.Bottom:= my + (Level.tilesize * zoom);
+  rect.Bottom:= my + (World.GetRoomByName(RoomName).tilesize * zoom);
   rect.Left:= mx;
-  rect.Right := mx + (Level.tilesize * zoom);
+  rect.Right := mx + (World.GetRoomByName(RoomName).tilesize * zoom);
 
 
-  if  Level.Layer[LayerId].Texture.Bitmap <> nil then
+  if  World.GetRoomByName(RoomName).Layer[LayerId].Texture.Bitmap <> nil then
   begin
      dstRect.Top := 0;
      dstRect.Left := 0;
-     dstRect.Bottom:= Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
-     dstRect.Right := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+     dstRect.Bottom:= World.GetRoomByName(RoomName).Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+     dstRect.Right := World.GetRoomByName(RoomName).Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
 
      Tileset.Bitmap.Fill(BGRAPixelTransparent);
-     Tileset.Bitmap.StretchPutImage(dstRect,Level.Layer[LayerId].Texture.Bitmap,TDrawMode.dmLinearBlend);
+     Tileset.Bitmap.StretchPutImage(dstRect,World.GetRoomByName(RoomName).Layer[LayerId].Texture.Bitmap,TDrawMode.dmLinearBlend);
 
     Tileset.Bitmap.Canvas.AntialiasingMode := amOff;
     Tileset.Bitmap.Canvas.DrawFocusRect(rect);

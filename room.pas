@@ -46,6 +46,8 @@ type
     property Scale: Integer read FScale write FScale;
 
     property Layer[Index: Integer]: TLayer read GetLayer write SetLayer;
+
+    procedure ResizeLayers;
   end;
 
 implementation
@@ -109,6 +111,17 @@ begin
     FLayers[i] := FLayers[i + 1];
 
   SetLength(FLayers, Length(FLayers) - 1);
+end;
+
+procedure TRoom.ResizeLayers;
+var
+  i: Integer;
+begin
+  for i := 0 to LayerCount - 1 do
+  begin
+    if Layer[i] <> nil then
+      Layer[i].Resize(Width, Height);
+  end;
 end;
 
 end.
