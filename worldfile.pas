@@ -177,7 +177,7 @@ begin
      Room := World.GetRoom(i);
      for j := 0 to Room.LayerCount - 1 do
      begin
-       jEntityArr.Clear;
+       jEntityArr := TJSONArray.Create;
        Layer := Room.Layer[j];
        if (Layer <> nil) then
        begin

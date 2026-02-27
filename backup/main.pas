@@ -243,7 +243,9 @@ begin
        ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
     end;
 
-    GameObjects := LevelFile.LoadGameObject('gameobject.json');
+    //GameObjects := LevelFile.LoadGameObject('gameobject.json');
+
+    GameObjects := WorldFile.LoadGameObject('gameobject.json');
 
     for i:= 0 to High(GameObjects) do
     begin
@@ -366,7 +368,7 @@ begin
 
     if(EdMode = 'tile') then
     begin
-      tileId := 0;
+      tileId := -1;
     end;
   end;
 end;
@@ -432,6 +434,8 @@ begin
      Room.Layer[LayerId].AddGameObject(
        objX,
        objY,
+       WorldFile.GetSprite(goName).w,
+       WorldFile.GetSprite(goName).h,
        goName
      );
      MainStatusBar.SimpleText:= 'ADD GAME OBJ '+goName;
@@ -668,7 +672,7 @@ begin
                  Renderer.DrawGameObject(
                    tmpLayer.GameObject[k].x,
                    tmpLayer.GameObject[k].y,
-                   LevelFile.GetSprite(tmpLayer.GameObject[k].Name),
+                   WorldFile.GetSprite(tmpLayer.GameObject[k].Name),
                  Texture);
                end;
              end;
@@ -727,7 +731,7 @@ begin
      Renderer.DrawGameObject(
            (OldMouseX - OffsetX) div scale,
            (OldMouseY - OffsetY) div scale,
-           LevelFile.GetSprite(ListBoxObject.GetSelectedText),
+           WorldFile.GetSprite(ListBoxObject.GetSelectedText),
            Texture);
 
   end

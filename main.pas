@@ -243,7 +243,9 @@ begin
        ListBoxLayers.AddItem(Level.Layer[i].Name,Level.Layer[i]);
     end;
 
-    GameObjects := LevelFile.LoadGameObject('gameobject.json');
+    //GameObjects := LevelFile.LoadGameObject('gameobject.json');
+
+    GameObjects := WorldFile.LoadGameObject('gameobject.json');
 
     for i:= 0 to High(GameObjects) do
     begin
@@ -432,57 +434,59 @@ begin
      Room.Layer[LayerId].AddGameObject(
        objX,
        objY,
+       WorldFile.GetSprite(goName).w,
+       WorldFile.GetSprite(goName).h,
        goName
      );
      MainStatusBar.SimpleText:= 'ADD GAME OBJ '+goName;
      GLBox.Invalidate;
    end;
 
-   if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
-   begin
-    if Button = mbLeft then
-       begin
-          MouseLeftBtn := true;
-          if (EdMode = 'tile') then
-          begin
-
-
-             if Level.Layer[LayerId].Data[posY][posX] <> tileId then
-             begin
-                  Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
-                  Level.InsertTile(layerId,posX,posY,tileID);
-             end
-            //Level.Layer[LayerId].Data[posY][posX] := tileID;
-
-          end
-          else
-          begin
-            goName := ListBoxObject.GetSelectedText;
-            objX := (x - offsetX) div ( Scale);
-            objY := (y - offsetY) div ( Scale);
-            Level.Layer[LayerId].AddGameObject(objX,objY,
-            LevelFile.GetSprite(goName).w,
-            LevelFile.GetSprite(goName).h,
-            goName);
-          end;
-
-       end;
-    if Button = mbRight then
-       begin
-          MouseRightBtn := true;
-          if (EdMode = 'tile') then
-          begin
-            Level.Layer[LayerId].Data[posY][posX] := -1;
-          end
-          else
-          begin
-            objx := (x - offsetx) div scale;
-            objy := (y - offsety) div scale;
-            GameObjectSelectedId := Level.Layer[LayerId].GetGameObject(objX,objY);
-          end;
-       end;
-       GLBox.invalidate;
-   end;
+   //if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
+   //begin
+   // if Button = mbLeft then
+   //    begin
+   //       MouseLeftBtn := true;
+   //       if (EdMode = 'tile') then
+   //       begin
+   //
+   //
+   //          if Level.Layer[LayerId].Data[posY][posX] <> tileId then
+   //          begin
+   //               Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
+   //               Level.InsertTile(layerId,posX,posY,tileID);
+   //          end
+   //         //Level.Layer[LayerId].Data[posY][posX] := tileID;
+   //
+   //       end
+   //       else
+   //       begin
+   //         goName := ListBoxObject.GetSelectedText;
+   //         objX := (x - offsetX) div ( Scale);
+   //         objY := (y - offsetY) div ( Scale);
+   //         Level.Layer[LayerId].AddGameObject(objX,objY,
+   //         LevelFile.GetSprite(goName).w,
+   //         LevelFile.GetSprite(goName).h,
+   //         goName);
+   //       end;
+   //
+   //    end;
+   // if Button = mbRight then
+   //    begin
+   //       MouseRightBtn := true;
+   //       if (EdMode = 'tile') then
+   //       begin
+   //         Level.Layer[LayerId].Data[posY][posX] := -1;
+   //       end
+   //       else
+   //       begin
+   //         objx := (x - offsetx) div scale;
+   //         objy := (y - offsety) div scale;
+   //         GameObjectSelectedId := Level.Layer[LayerId].GetGameObject(objX,objY);
+   //       end;
+   //    end;
+   //    GLBox.invalidate;
+   //end;
 
    if Button = mbMiddle then
    begin
@@ -668,7 +672,7 @@ begin
                  Renderer.DrawGameObject(
                    tmpLayer.GameObject[k].x,
                    tmpLayer.GameObject[k].y,
-                   LevelFile.GetSprite(tmpLayer.GameObject[k].Name),
+                   WorldFile.GetSprite(tmpLayer.GameObject[k].Name),
                  Texture);
                end;
              end;
@@ -727,7 +731,7 @@ begin
      Renderer.DrawGameObject(
            (OldMouseX - OffsetX) div scale,
            (OldMouseY - OffsetY) div scale,
-           LevelFile.GetSprite(ListBoxObject.GetSelectedText),
+           WorldFile.GetSprite(ListBoxObject.GetSelectedText),
            Texture);
 
   end
