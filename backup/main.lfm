@@ -47,9 +47,9 @@ object FormMain: TFormMain
       Height = 330
       Top = 353
       Width = 286
-      ActivePage = TabTileset
+      ActivePage = TabSheet1
       Align = alClient
-      TabIndex = 0
+      TabIndex = 3
       TabOrder = 1
       object TabTileset: TTabSheet
         Caption = 'Tileset'
@@ -262,6 +262,7 @@ object FormMain: TFormMain
           Width = 75
           Caption = 'New'
           TabOrder = 8
+          OnClick = btnRoomNewClick
         end
       end
     end

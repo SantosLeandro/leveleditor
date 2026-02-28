@@ -63,6 +63,7 @@ type
     TimerInit: TTimer;
     TrackBar1: TTrackBar;
     procedure btnRoomApplyClick(Sender: TObject);
+    procedure btnRoomNewClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -106,6 +107,7 @@ type
     roomName: String;
     Level: TLevel;
     Texture: TTexture;
+    Texture2: TTexture;
     Renderer: TRenderer;
     LevelFile: TLevelFile;
     WorldFile: TWorldFile;
@@ -177,7 +179,7 @@ begin
     begin
       for j:=0 to high(tiles[i]) do
       begin
-        tiles[i][j] := 0;
+        tiles[i][j] := -1;
       end;
     end;
     result := tiles;
@@ -188,13 +190,17 @@ var
   i: integer;
   FirstRoom: TRoom;
   SecondRoom: TRoom;
-  Texture2: TTexture;
   tiledata: String;
 begin
     Texture := TTexture.Create();
     Texture2 := TTexture.Create();
 
-    tiledata := '1,1,1,1,1,1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1';
+    //tiledata := '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1';
+    tiledata := '-1';
+    for i:=0 to 100 do
+    begin
+      tiledata := tiledata+',-1';
+    end;
 
 
     Texture.LoadFromFile('gameobject.png');
@@ -203,7 +209,7 @@ begin
     FirstRoom := TRoom.Create(1);
     RoomName :=  'first_room';
     FirstRoom.Name:= RoomName;
-    FirstRoom.AddLayer(TLayer.Create(Texture2,tileData,10,10,'background'));
+    FirstRoom.AddLayer(TLayer.Create(Texture2,tiledata,10,10,'background'));
     FirstRoom.Width:= 10;
     FirstRoom.Height:= 10;
     FirstRoom.Tilesize:= 16;
@@ -213,7 +219,7 @@ begin
 
     SecondRoom := TRoom.Create(1);
     SecondRoom.Name:= 'second_room';
-    SecondRoom.AddLayer(TLayer.Create(Texture2,tileData,10,10,'background'));
+    SecondRoom.AddLayer(TLayer.Create(Texture2,tiledata,10,10,'background'));
     SecondRoom.Width:= 10;
     SecondRoom.Height:= 10;
     SecondRoom.Tilesize:= 16;
@@ -341,6 +347,44 @@ begin
     listBoxRooms.Items[listBoxRooms.ItemIndex] := Room.Name;
 
   GLBox.Invalidate;
+end;
+
+procedure TFormMain.btnRoomNewClick(Sender: TObject);
+var
+  Room: TRoom;
+  i: integer;
+  tiledata: string;
+begin
+  // cria um novo room com tamanho inicial (exemplo)
+  Room := TRoom.Create(1);
+
+  Room.Name := 'Room_' + IntToStr(World.RoomCount + 1);
+  Room.Width := 20;
+  Room.Height := 15;
+  Room.Tilesize := 16;
+  Room.X := 0;
+  Room.Y := 0;
+
+  tiledata := '-1';
+  for i:=0 to Room.Width * Room.Height do
+  begin
+    tiledata := tiledata+',-1';
+  end;
+  Room.AddLayer(TLayer.Create(Texture2,tiledata,Room.Width,Room.Height,'background'));
+
+  // adiciona no world
+  World.AddRoom(Room);
+
+
+
+  // adiciona na lista visual
+  ListBoxRooms.Items.Add(Room.Name);
+
+  // seleciona o novo room
+  ListBoxRooms.ItemIndex := ListBoxRooms.Count - 1;
+
+  // opcional: preencher os edits com os dados do room
+  roomName:= Room.name;
 end;
 
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word;
