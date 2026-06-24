@@ -703,17 +703,29 @@ end;
 
 procedure TFormMain.GLBoxMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var
+  worldX, worldY: Double;
+  newScale: Integer;
 begin
+  newScale := scale;
   if WheelDelta > 0 then
-  begin
-    scale := scale + 1;
-  end
+    newScale := scale + 1
   else if (WheelDelta < 0) and (scale > 1) then
+    newScale := scale - 1;
+
+  if newScale <> scale then
   begin
-     scale := scale - 1;
+    worldX := (MousePos.X - offsetX) / (Level.tileSize * scale);
+    worldY := (MousePos.Y - offsetY) / (Level.tileSize * scale);
+
+    scale := newScale;
+
+    offsetX := Round(MousePos.X - worldX * (Level.tileSize * scale));
+    offsetY := Round(MousePos.Y - worldY * (Level.tileSize * scale));
+
+    Renderer.Scale := scale;
+    GLBox.Invalidate;
   end;
-  Renderer.Scale := scale;
-  GLBox.Invalidate;
 end;
 
 procedure TFormMain.GLBoxMouseWheelDown(Sender: TObject; Shift: TShiftState;
