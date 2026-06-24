@@ -20,6 +20,7 @@ type
     btnRoomApply: TButton;
     btnRoomDelete: TButton;
     btnRoomNew: TButton;
+    btnNewLayer: TButton;
     edtRoomHeight: TEdit;
     edtRoomTilesize: TEdit;
     editRoomX: TEdit;
@@ -62,6 +63,7 @@ type
     MainStatusBar: TStatusBar;
     TimerInit: TTimer;
     TrackBar1: TTrackBar;
+    procedure btnNewLayerClick(Sender: TObject);
     procedure btnRoomApplyClick(Sender: TObject);
     procedure btnRoomNewClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -83,6 +85,7 @@ type
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
     procedure listBoxRoomsSelectionChange(Sender: TObject; User: boolean);
+    procedure MainPageControlChange(Sender: TObject);
     procedure menuDeleteClick(Sender: TObject);
     procedure menuUndoClick(Sender: TObject);
     procedure MenuItemSaveAsClick(Sender: TObject);
@@ -349,6 +352,54 @@ begin
   GLBox.Invalidate;
 end;
 
+procedure TFormMain.btnNewLayerClick(Sender: TObject);
+var
+  i: Integer;
+  Room: TRoom;
+  Layer: TLayer;
+  Tex: TTexture;
+  layerName: string;
+  tiledata: string;
+  j: integer;
+begin
+  layerName := 'Layer_' + IntToStr(World.GetRoom(0).LayerCount + 1);
+
+  for i := 0 to World.RoomCount - 1 do
+  begin
+    Room := World.GetRoom(i);
+
+    // textura vazia ou padrão
+    //Tex := TTexture.Create;
+
+    tiledata := '-1';
+    for j:=0 to Room.Width * Room.Height do
+    begin
+      tiledata := tiledata+',-1';
+    end;
+
+    // cria layer com tamanho do room
+    Layer := TLayer.Create(
+      World.GetRoom(i).layer[0].Texture,
+      tiledata,                // data vazia
+      Room.Width,
+      Room.Height,
+      layerName
+    );
+
+    Room.AddLayer(Layer);
+  end;
+
+  // atualizar lista de layers do room atual
+  ListBoxLayers.Clear;
+  for i := 0 to World.GetRoomByName(RoomName).LayerCount - 1 do
+    ListBoxLayers.AddItem(
+      World.GetRoomByName(RoomName).Layer[i].Name,
+      World.GetRoomByName(RoomName).Layer[i]
+    );
+
+  Tileset.Invalidate;
+end;
+
 procedure TFormMain.btnRoomNewClick(Sender: TObject);
 var
   Room: TRoom;
@@ -370,7 +421,7 @@ begin
   begin
     tiledata := tiledata+',-1';
   end;
-  Room.AddLayer(TLayer.Create(Texture2,tiledata,10,10,'background'));
+  Room.AddLayer(TLayer.Create(Texture2,tiledata,Room.Width,Room.Height,'background'));
 
   // adiciona no world
   World.AddRoom(Room);
@@ -801,7 +852,7 @@ end;
 procedure TFormMain.ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
 begin
   LayerId := ListBoxLayers.ItemIndex;
-  if Level.Layer[LayerId].Texture.Bitmap <> nil then
+  if World.GetRoomByName(RoomName).Layer[LayerId].Texture.Bitmap <> nil then
   begin
     //Tileset.Bitmap.Bitmap := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
    //Tileset2t.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
@@ -812,6 +863,11 @@ procedure TFormMain.listBoxRoomsSelectionChange(Sender: TObject; User: boolean);
 begin
   if listBoxRooms.ItemIndex <> -1 then
     RoomName := listBoxRooms.Items[listBoxRooms.ItemIndex];
+end;
+
+procedure TFormMain.MainPageControlChange(Sender: TObject);
+begin
+
 end;
 
 procedure TFormMain.menuDeleteClick(Sender: TObject);

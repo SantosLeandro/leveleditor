@@ -28,7 +28,12 @@ var
   str: string;
 begin
   str := Dict.values[name];
-  i:= StrToInt(Dict.values[name]);
+  if str = '' then
+  begin
+    Result.x := 0; Result.y := 0; Result.w := 0; Result.h := 0;
+    Exit;
+  end;
+  i:= StrToInt(str);
   result := Sprites[i];
 end;
 

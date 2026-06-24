@@ -11,7 +11,6 @@ uses
   BGRASpriteAnimation, BGRABitmap, BCTypes, BGRAGraphicControl,BGRATransform,BGRABitmapTypes, Types;
 
 type
-  EditingMode = (ED_TILEMAP, ED_GAMEOBJECT);
   { TFormMain }
 
   TFormMain = class(TForm)
@@ -20,6 +19,7 @@ type
     btnRoomApply: TButton;
     btnRoomDelete: TButton;
     btnRoomNew: TButton;
+    btnNewLayer: TButton;
     edtRoomHeight: TEdit;
     edtRoomTilesize: TEdit;
     editRoomX: TEdit;
@@ -62,6 +62,7 @@ type
     MainStatusBar: TStatusBar;
     TimerInit: TTimer;
     TrackBar1: TTrackBar;
+    procedure btnNewLayerClick(Sender: TObject);
     procedure btnRoomApplyClick(Sender: TObject);
     procedure btnRoomNewClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -83,6 +84,7 @@ type
     procedure GLBoxPaint(Sender: TObject);
     procedure ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
     procedure listBoxRoomsSelectionChange(Sender: TObject; User: boolean);
+    procedure MainPageControlChange(Sender: TObject);
     procedure menuDeleteClick(Sender: TObject);
     procedure menuUndoClick(Sender: TObject);
     procedure MenuItemSaveAsClick(Sender: TObject);
@@ -131,6 +133,7 @@ type
     EdMode: string;
     GameObjectId:integer;
     GameObjectSelectedId: integer;
+    UndoStack: TStack;
     function getTestMap: TIntegerArray;
     procedure InitLevel;
     procedure OnInitTimer(Sender: TObject);
@@ -294,6 +297,7 @@ begin
   MouseRightBtn:=false;
   Zoom := 1;
   GameObjectSelectedId:= -1;
+  UndoStack := TStack.Create;
   InitLevel;
 
   //TimerInit.Interval := 2000; // 2 segundos
@@ -347,6 +351,57 @@ begin
     listBoxRooms.Items[listBoxRooms.ItemIndex] := Room.Name;
 
   GLBox.Invalidate;
+end;
+
+procedure TFormMain.btnNewLayerClick(Sender: TObject);
+var
+  i: Integer;
+  Room: TRoom;
+  Layer: TLayer;
+  Tex: TTexture;
+  layerName: string;
+  tiledata: string;
+  j: integer;
+begin
+  layerName := 'Layer_' + IntToStr(World.GetRoom(0).LayerCount + 1);
+
+  for i := 0 to World.RoomCount - 1 do
+  begin
+    Room := World.GetRoom(i);
+
+    // textura vazia ou padrão
+    //Tex := TTexture.Create;
+
+    tiledata := '-1';
+    for j:=0 to Room.Width * Room.Height do
+    begin
+      tiledata := tiledata+',-1';
+    end;
+
+    // cria layer com tamanho do room
+    Layer := TLayer.Create(
+      World.GetRoom(i).layer[0].Texture,
+      tiledata,                // data vazia
+      Room.Width,
+      Room.Height,
+      layerName
+    );
+
+    Room.AddLayer(Layer);
+  end;
+
+  // atualizar lista de layers do room atual
+  if World.GetRoomByName(RoomName) <> nil then
+  begin
+    ListBoxLayers.Clear;
+    for i := 0 to World.GetRoomByName(RoomName).LayerCount - 1 do
+      ListBoxLayers.AddItem(
+        World.GetRoomByName(RoomName).Layer[i].Name,
+        World.GetRoomByName(RoomName).Layer[i]
+      );
+  end;
+
+  Tileset.Invalidate;
 end;
 
 procedure TFormMain.btnRoomNewClick(Sender: TObject);
@@ -451,8 +506,15 @@ begin
      MouseLeftBtn := true;
      roomX := (x - (room.X*scale) - offsetX) div (Room.tileSize * Scale);
      roomY := (y - (room.Y*scale) - offsetY) div (Room.tileSize * Scale);
-     Room.Layer[LayerId].Data[roomY][roomX] := tileId;
-     MainStatusBar.SimpleText:= Room.Name;
+     if (roomY >= 0) and (roomY < Room.Height) and (roomX >= 0) and (roomX < Room.Width) then
+     begin
+       if Room.Layer[LayerId].Data[roomY][roomX] <> tileId then
+       begin
+         UndoStack.Push(TCommand.Create(LayerId, Room.Layer[LayerId].Data[roomY][roomX], roomX, roomY, Room.Name));
+         Room.Layer[LayerId].Data[roomY][roomX] := tileId;
+       end;
+       MainStatusBar.SimpleText:= Room.Name;
+     end;
      GLBox.Invalidate;
    end;
 
@@ -473,6 +535,7 @@ begin
    if (Room <> nil) and (Button = mbLeft) and (EdMode <> 'tile') then
    begin
      goName := ListBoxObject.GetSelectedText;
+     if goName = '' then Exit;
      objX := (x - (room.X*scale) - offsetX) div ( Scale);
      objY := (y - (room.Y*scale) - offsetY) div ( Scale);
      Room.Layer[LayerId].AddGameObject(
@@ -558,13 +621,20 @@ begin
      posY := (Y - offsetY) div (Level.tileSize * Scale);
 
      Room := world.GetRoom(posX,posY);
-     if (Room <> nil) and (MouseLeftBtn) and (EdMode = 'tile') then
-     begin
-       roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
-       roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
-       Room.Layer[LayerId].Data[roomY][roomX] := tileId;
-       GLBox.Invalidate;
-     end;
+      if (Room <> nil) and (MouseLeftBtn) and (EdMode = 'tile') then
+      begin
+        roomX := (x - (room.X*scale) - offsetX) div (Level.tileSize * Scale);
+        roomY := (y - (room.Y*scale) - offsetY) div (Level.tileSize * Scale);
+        if (roomY >= 0) and (roomY < Room.Height) and (roomX >= 0) and (roomX < Room.Width) then
+        begin
+          if Room.Layer[LayerId].Data[roomY][roomX] <> tileId then
+          begin
+            UndoStack.Push(TCommand.Create(LayerId, Room.Layer[LayerId].Data[roomY][roomX], roomX, roomY, Room.Name));
+            Room.Layer[LayerId].Data[roomY][roomX] := tileId;
+          end;
+        end;
+        GLBox.Invalidate;
+      end;
 
      if MouseMiddleBtn then
      begin
@@ -576,19 +646,19 @@ begin
      begin
         posX := (x - offsetX) div (Level.tileSize * Scale);
         posY := (y - offsetY) div (Level.tileSize * Scale);
-        if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
-        begin
-          if (EdMode = 'tile') then
-          begin
-             if Level.Layer[LayerId].Data[posY][posX] <> tileId then
-             begin
-                  Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
-                  Level.InsertTile(layerId,posX,posY,tileID);
-             end
-
-             //Level.Layer[LayerId].Data[posY][posX] := tileID;
-          end
-        end
+        //if (posY >= 0) and ( posY <= High(Level.Layer[LayerId].Data)) and (posX >=0 ) and (posX <= High(Level.Layer[LayerId].Data[0])) then
+        //begin
+        //  if (EdMode = 'tile') then
+        //  begin
+        //     if Level.Layer[LayerId].Data[posY][posX] <> tileId then
+        //     begin
+        //          Level.SaveCommand(LayerId,Level.Layer[LayerId].Data[posY][posX], posX, posY);
+        //          Level.InsertTile(layerId,posX,posY,tileID);
+        //     end
+        //
+        //     //Level.Layer[LayerId].Data[posY][posX] := tileID;
+        //  end
+        //end
      end;
 
      if MouseRightBtn = true then
@@ -766,18 +836,20 @@ begin
 
   if(EdMode <> 'tile') then
   begin
-     glLoadIdentity();
-     glTranslatef(offsetX, offsetY, 0);
-     Renderer.ColorR := 0.0;
-     Renderer.ColorG := 1.0;
-     Renderer.ColorB := 0.0;
-     Renderer.ColorA := 0.3;
-     Renderer.DrawGameObject(
-           (OldMouseX - OffsetX) div scale,
-           (OldMouseY - OffsetY) div scale,
-           WorldFile.GetSprite(ListBoxObject.GetSelectedText),
-           Texture);
-
+     if ListBoxObject.GetSelectedText <> '' then
+     begin
+       glLoadIdentity();
+       glTranslatef(offsetX, offsetY, 0);
+       Renderer.ColorR := 0.0;
+       Renderer.ColorG := 1.0;
+       Renderer.ColorB := 0.0;
+       Renderer.ColorA := 0.3;
+       Renderer.DrawGameObject(
+             (OldMouseX - OffsetX) div scale,
+             (OldMouseY - OffsetY) div scale,
+             WorldFile.GetSprite(ListBoxObject.GetSelectedText),
+             Texture);
+     end;
   end
   else
   begin
@@ -799,9 +871,13 @@ begin
 end;
 
 procedure TFormMain.ListBoxLayersSelectionChange(Sender: TObject; User: boolean);
+var
+  Room: TRoom;
 begin
   LayerId := ListBoxLayers.ItemIndex;
-  if Level.Layer[LayerId].Texture.Bitmap <> nil then
+  Room := World.GetRoomByName(RoomName);
+  if (Room <> nil) and (LayerId >= 0) and (LayerId < Room.LayerCount) and
+     (Room.Layer[LayerId].Texture.Bitmap <> nil) then
   begin
     //Tileset.Bitmap.Bitmap := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
    //Tileset2t.Sprite := Level.Layer[LayerId].Texture.Bitmap.Bitmap;
@@ -814,6 +890,11 @@ begin
     RoomName := listBoxRooms.Items[listBoxRooms.ItemIndex];
 end;
 
+procedure TFormMain.MainPageControlChange(Sender: TObject);
+begin
+
+end;
+
 procedure TFormMain.menuDeleteClick(Sender: TObject);
 begin
 
@@ -821,11 +902,19 @@ end;
 
 procedure TFormMain.menuUndoClick(Sender: TObject);
 var
-   oldCommand :TCommand;
+   oldCommand: TCommand;
+   Room: TRoom;
 begin
-   if (Level.Undo(oldCommand)) then
+   oldCommand := UndoStack.Pop;
+   if oldCommand <> nil then
    begin
-     Level.InsertTile(oldCommand.layer,oldCommand.w,oldCommand.h,oldCommand.tile);
+     Room := World.GetRoomByName(oldCommand.RoomName);
+     if (Room <> nil) and (oldCommand.Layer >= 0) and (oldCommand.Layer < Room.LayerCount) then
+     begin
+       if (oldCommand.h >= 0) and (oldCommand.h < Room.Height) and
+          (oldCommand.w >= 0) and (oldCommand.w < Room.Width) then
+         Room.Layer[oldCommand.Layer].Data[oldCommand.h][oldCommand.w] := oldCommand.Tile;
+     end;
      oldCommand.Free;
      GLBox.Invalidate;
    end;
@@ -933,10 +1022,13 @@ var
 begin
   //col := x div Level.Tilesize;
   //row := y div Level.Tilesize;
-   col := TilesetCursor.x div (World.GetRoomByName(RoomName).tilesize * zoom);
-   row := TilesetCursor.y div (World.GetRoomByName(RoomName).tilesize * zoom);
-   MainStatusBar.SimpleText := 'COL: ' + IntToStr(Col);
-   tileId := col + (row * ( World.GetRoomByName(RoomName).Layer[LayerId].Texture.Width div Level.Tilesize));
+   if World.GetRoomByName(RoomName) <> nil then
+   begin
+     col := TilesetCursor.x div (World.GetRoomByName(RoomName).tilesize * zoom);
+     row := TilesetCursor.y div (World.GetRoomByName(RoomName).tilesize * zoom);
+     MainStatusBar.SimpleText := 'COL: ' + IntToStr(Col);
+     tileId := col + (row * ( World.GetRoomByName(RoomName).Layer[LayerId].Texture.Width div Level.Tilesize));
+   end;
 end;
 
 procedure TFormMain.TilesetMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -1007,6 +1099,8 @@ var
 begin
   //mX := ((TilesetCursor.x) div (Level.Tilesize * zoom)) * (tileSize * zoom);
   //mY := ((TilesetCursor.y) div (Level.Tilesize * zoom)) * (tileSize * zoom);
+  if World.GetRoomByName(RoomName) = nil then Exit;
+
   mx :=  TilesetCursor.x;
   my :=  TilesetCursor.y;
   rect.Top:= my;
@@ -1032,9 +1126,12 @@ end;
 
 procedure TFormMain.TrackBar1Change(Sender: TObject);
 begin
-  zoom := TrackBAr1.Position;
-  Tileset.Width := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
-     Tileset.Height := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+  zoom := TrackBar1.Position;
+  if (Level.Layer[LayerId] <> nil) and (Level.Layer[LayerId].Texture.Bitmap <> nil) then
+  begin
+    Tileset.Width := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Width * zoom;
+    Tileset.Height := Level.Layer[LayerId].Texture.Bitmap.Bitmap.Height * zoom;
+  end;
   Tileset.Invalidate;
 end;
 

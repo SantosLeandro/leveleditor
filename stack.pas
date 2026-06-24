@@ -13,7 +13,8 @@ type
   TCommand = class
     public
       Layer, Tile, w, h: integer;
-      constructor Create(l,t,w1,h1: integer);
+      RoomName: string;
+      constructor Create(l,t,w1,h1: integer; const aRoomName: string = '');
   end;
 
   TStack = class
@@ -29,12 +30,13 @@ type
   end;
 
 implementation
-constructor TCommand.Create(l,t,w1,h1: integer);
+constructor TCommand.Create(l,t,w1,h1: integer; const aRoomName: string = '');
 begin
   layer:= l;
   tile:=t;
   w:= w1;
   h:= h1;
+  RoomName := aRoomName;
 end;
 constructor TStack.Create();
 begin
@@ -75,6 +77,7 @@ function TStack.Pop(): TCommand;
 var
   C: TCommand;
 begin
+  Result := nil;
   if not IsEmpty() then
   begin
     C := FData[FTop];
